@@ -27,7 +27,7 @@ type PlanSettings = {
 };
 
 type KlineInterval = '1h' | '4h' | '1d' | '1w' | '1M';
-type KlineProvider = 'OKX' | 'Binance';
+type KlineProvider = 'HTX' | 'Gate' | 'OKX' | 'Binance';
 
 type TradeDraft = Omit<Trade, 'id'>;
 
@@ -67,6 +67,75 @@ const okxBarByInterval: Record<KlineInterval, string> = {
   '1w': '1W',
   '1M': '1M',
 };
+
+const htxPeriodByInterval: Record<KlineInterval, string> = {
+  '1h': '60min',
+  '4h': '4hour',
+  '1d': '1day',
+  '1w': '1week',
+  '1M': '1mon',
+};
+
+const gateIntervalByInterval: Record<KlineInterval, string> = {
+  '1h': '1h',
+  '4h': '4h',
+  '1d': '1d',
+  '1w': '7d',
+  '1M': '30d',
+};
+
+async function fetchHtxCandles(interval: KlineInterval, limit: number, signal: AbortSignal): Promise<Candle[]> {
+  const response = await fetch(
+    `https://api.huobi.pro/market/history/kline?symbol=btcusdt&period=${htxPeriodByInterval[interval]}&size=${Math.min(limit, 300)}`,
+    { signal },
+  );
+
+  if (!response.ok) {
+    throw new Error(`HTX HTTP ${response.status}`);
+  }
+
+  const payload = (await response.json()) as {
+    status: string;
+    errMsg?: string;
+    data?: Array<{ id: number; open: number; high: number; low: number; close: number }>;
+  };
+
+  if (payload.status !== 'ok' || !payload.data) {
+    throw new Error(`HTX ${payload.errMsg || payload.status}`);
+  }
+
+  return payload.data
+    .map((row) => ({
+      time: row.id * 1000,
+      open: row.open,
+      high: row.high,
+      low: row.low,
+      close: row.close,
+    }))
+    .sort((a, b) => a.time - b.time);
+}
+
+async function fetchGateCandles(interval: KlineInterval, limit: number, signal: AbortSignal): Promise<Candle[]> {
+  const response = await fetch(
+    `https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair=BTC_USDT&interval=${gateIntervalByInterval[interval]}&limit=${Math.min(limit, 300)}`,
+    { signal },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Gate HTTP ${response.status}`);
+  }
+
+  const rows = (await response.json()) as string[][];
+  return rows
+    .map((row) => ({
+      time: Number(row[0]) * 1000,
+      open: Number(row[5]),
+      high: Number(row[3]),
+      low: Number(row[4]),
+      close: Number(row[2]),
+    }))
+    .sort((a, b) => a.time - b.time);
+}
 
 async function fetchOkxCandles(interval: KlineInterval, limit: number, signal: AbortSignal): Promise<Candle[]> {
   const response = await fetch(
@@ -180,22 +249,37 @@ function useBtcCandles(interval: KlineInterval) {
     async function load() {
       setIsLoading(true);
       setError('');
-      setStatus(`加载 OKX BTC/USDT ${selectedInterval.label}...`);
+      setStatus(`加载 HTX BTC/USDT ${selectedInterval.label}...`);
 
       try {
-        let provider: KlineProvider = 'OKX';
-        let nextCandles: Candle[];
+        const providers: Array<{ name: KlineProvider; load: () => Promise<Candle[]> }> = [
+          { name: 'HTX', load: () => fetchHtxCandles(interval, selectedInterval.limit, controller.signal) },
+          { name: 'Gate', load: () => fetchGateCandles(interval, selectedInterval.limit, controller.signal) },
+          { name: 'OKX', load: () => fetchOkxCandles(interval, selectedInterval.limit, controller.signal) },
+          { name: 'Binance', load: () => fetchBinanceCandles(interval, selectedInterval.limit, controller.signal) },
+        ];
+        const errors: string[] = [];
+        let provider: KlineProvider | null = null;
+        let nextCandles: Candle[] = [];
 
-        try {
-          nextCandles = await fetchOkxCandles(interval, selectedInterval.limit, controller.signal);
-        } catch (okxError) {
+        for (const candidate of providers) {
           if (controller.signal.aborted) {
-            throw okxError;
+            break;
           }
 
-          provider = 'Binance';
-          setStatus(`OKX 不可用，尝试 Binance BTC/USDT ${selectedInterval.label}...`);
-          nextCandles = await fetchBinanceCandles(interval, selectedInterval.limit, controller.signal);
+          try {
+            setStatus(`加载 ${candidate.name} BTC/USDT ${selectedInterval.label}...`);
+            nextCandles = await candidate.load();
+            provider = candidate.name;
+            break;
+          } catch (candidateError) {
+            const message = candidateError instanceof Error ? candidateError.message : '未知错误';
+            errors.push(`${candidate.name}: ${message}`);
+          }
+        }
+
+        if (!provider || nextCandles.length === 0) {
+          throw new Error(errors.join('；') || '所有行情源均不可用');
         }
 
         klineCache.set(interval, { candles: nextCandles, provider });
