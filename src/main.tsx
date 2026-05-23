@@ -27,7 +27,7 @@ type PlanSettings = {
 };
 
 type KlineInterval = '1h' | '4h' | '1d' | '1w' | '1M';
-type KlineProvider = 'HTX' | 'Gate' | 'OKX' | 'Binance';
+type KlineProvider = 'CryptoCompare' | 'Gate' | 'HTX' | 'OKX' | 'Binance';
 
 type TradeDraft = Omit<Trade, 'id'>;
 
@@ -83,6 +83,44 @@ const gateIntervalByInterval: Record<KlineInterval, string> = {
   '1w': '7d',
   '1M': '30d',
 };
+
+const cryptoCompareConfigByInterval: Record<KlineInterval, { endpoint: 'histohour' | 'histoday'; aggregate: number; limit: number }> = {
+  '1h': { endpoint: 'histohour', aggregate: 1, limit: 500 },
+  '4h': { endpoint: 'histohour', aggregate: 4, limit: 500 },
+  '1d': { endpoint: 'histoday', aggregate: 1, limit: 365 },
+  '1w': { endpoint: 'histoday', aggregate: 7, limit: 260 },
+  '1M': { endpoint: 'histoday', aggregate: 30, limit: 120 },
+};
+
+async function fetchCryptoCompareCandles(interval: KlineInterval, signal: AbortSignal): Promise<Candle[]> {
+  const config = cryptoCompareConfigByInterval[interval];
+  const response = await fetch(
+    `https://min-api.cryptocompare.com/data/v2/${config.endpoint}?fsym=BTC&tsym=USDT&limit=${config.limit}&aggregate=${config.aggregate}`,
+    { signal },
+  );
+
+  if (!response.ok) {
+    throw new Error(`CryptoCompare HTTP ${response.status}`);
+  }
+
+  const payload = (await response.json()) as {
+    Response: string;
+    Message?: string;
+    Data?: { Data?: Array<{ time: number; open: number; high: number; low: number; close: number }> };
+  };
+
+  if (payload.Response !== 'Success' || !payload.Data?.Data) {
+    throw new Error(`CryptoCompare ${payload.Message || payload.Response}`);
+  }
+
+  return payload.Data.Data.map((row) => ({
+    time: row.time * 1000,
+    open: row.open,
+    high: row.high,
+    low: row.low,
+    close: row.close,
+  })).sort((a, b) => a.time - b.time);
+}
 
 async function fetchHtxCandles(interval: KlineInterval, limit: number, signal: AbortSignal): Promise<Candle[]> {
   const response = await fetch(
@@ -228,6 +266,8 @@ function useBtcCandles(interval: KlineInterval) {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    let isActive = true;
+    const providerControllers: AbortController[] = [];
     const cachedCandles = klineCache.get(interval);
     const selectedInterval = intervalOptions.find((option) => option.value === interval) ?? intervalOptions[2];
 
@@ -239,37 +279,39 @@ function useBtcCandles(interval: KlineInterval) {
       return;
     }
 
-    const controller = new AbortController();
-    let abortedByTimeout = false;
-    const timeoutId = window.setTimeout(() => {
-      abortedByTimeout = true;
-      controller.abort();
-    }, 10000);
+    function loadProviderWithTimeout(candidate: { name: KlineProvider; load: (signal: AbortSignal) => Promise<Candle[]> }) {
+      const controller = new AbortController();
+      providerControllers.push(controller);
+      const timeoutId = window.setTimeout(() => controller.abort(), 6000);
+
+      return candidate.load(controller.signal).finally(() => window.clearTimeout(timeoutId));
+    }
 
     async function load() {
       setIsLoading(true);
       setError('');
-      setStatus(`加载 HTX BTC/USDT ${selectedInterval.label}...`);
+      setStatus(`加载 CryptoCompare BTC/USDT ${selectedInterval.label}...`);
 
       try {
-        const providers: Array<{ name: KlineProvider; load: () => Promise<Candle[]> }> = [
-          { name: 'HTX', load: () => fetchHtxCandles(interval, selectedInterval.limit, controller.signal) },
-          { name: 'Gate', load: () => fetchGateCandles(interval, selectedInterval.limit, controller.signal) },
-          { name: 'OKX', load: () => fetchOkxCandles(interval, selectedInterval.limit, controller.signal) },
-          { name: 'Binance', load: () => fetchBinanceCandles(interval, selectedInterval.limit, controller.signal) },
+        const providers: Array<{ name: KlineProvider; load: (signal: AbortSignal) => Promise<Candle[]> }> = [
+          { name: 'CryptoCompare', load: (signal) => fetchCryptoCompareCandles(interval, signal) },
+          { name: 'Gate', load: (signal) => fetchGateCandles(interval, selectedInterval.limit, signal) },
+          { name: 'HTX', load: (signal) => fetchHtxCandles(interval, selectedInterval.limit, signal) },
+          { name: 'OKX', load: (signal) => fetchOkxCandles(interval, selectedInterval.limit, signal) },
+          { name: 'Binance', load: (signal) => fetchBinanceCandles(interval, selectedInterval.limit, signal) },
         ];
         const errors: string[] = [];
         let provider: KlineProvider | null = null;
         let nextCandles: Candle[] = [];
 
         for (const candidate of providers) {
-          if (controller.signal.aborted) {
+          if (!isActive) {
             break;
           }
 
           try {
             setStatus(`加载 ${candidate.name} BTC/USDT ${selectedInterval.label}...`);
-            nextCandles = await candidate.load();
+            nextCandles = await loadProviderWithTimeout(candidate);
             provider = candidate.name;
             break;
           } catch (candidateError) {
@@ -282,28 +324,30 @@ function useBtcCandles(interval: KlineInterval) {
           throw new Error(errors.join('；') || '所有行情源均不可用');
         }
 
+        if (!isActive) {
+          return;
+        }
+
         klineCache.set(interval, { candles: nextCandles, provider });
         setCandles(nextCandles);
         setStatus(`${provider} BTC/USDT ${selectedInterval.label}`);
       } catch (error) {
-        if (!controller.signal.aborted) {
+        if (isActive) {
           const message = error instanceof Error ? error.message : '未知错误';
           setError(`K 线加载失败：${message}`);
           setStatus(`BTC/USDT ${selectedInterval.label}`);
-        } else if (abortedByTimeout) {
-          setError('K 线请求超时，请稍后重试。');
-          setStatus(`BTC/USDT ${selectedInterval.label}`);
         }
       } finally {
-        window.clearTimeout(timeoutId);
-        setIsLoading(false);
+        if (isActive) {
+          setIsLoading(false);
+        }
       }
     }
 
     load();
     return () => {
-      window.clearTimeout(timeoutId);
-      controller.abort();
+      isActive = false;
+      providerControllers.forEach((controller) => controller.abort());
     };
   }, [interval]);
 
