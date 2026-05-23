@@ -1,0 +1,25 @@
+{
+  "name": "btc-dca-monitor",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "homepage": "https://drincann.github.io/btc-dca-monitor/",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "deploy": "npm run build && gh-pages -d dist"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "typescript": "latest",
+    "vite": "latest"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.15",
+    "@types/react-dom": "^19.2.3",
+    "gh-pages": "^6.3.0"
+  }
+}
