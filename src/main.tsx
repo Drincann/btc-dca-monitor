@@ -27,6 +27,7 @@ type PlanSettings = {
 };
 
 type KlineInterval = '1h' | '4h' | '1d' | '1w' | '1M';
+type KlineProvider = 'OKX' | 'Binance';
 
 type TradeDraft = Omit<Trade, 'id'>;
 
@@ -57,7 +58,61 @@ const defaultTradeDraft = (): TradeDraft => ({
 
 const currency = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 const btcFormat = new Intl.NumberFormat('en-US', { maximumFractionDigits: 6 });
-const klineCache = new Map<KlineInterval, Candle[]>();
+const klineCache = new Map<string, { candles: Candle[]; provider: KlineProvider }>();
+
+const okxBarByInterval: Record<KlineInterval, string> = {
+  '1h': '1H',
+  '4h': '4H',
+  '1d': '1D',
+  '1w': '1W',
+  '1M': '1M',
+};
+
+async function fetchOkxCandles(interval: KlineInterval, limit: number, signal: AbortSignal): Promise<Candle[]> {
+  const response = await fetch(
+    `https://www.okx.com/api/v5/market/candles?instId=BTC-USDT&bar=${okxBarByInterval[interval]}&limit=${Math.min(limit, 300)}`,
+    { signal },
+  );
+
+  if (!response.ok) {
+    throw new Error(`OKX HTTP ${response.status}`);
+  }
+
+  const payload = (await response.json()) as { code: string; msg?: string; data?: string[][] };
+  if (payload.code !== '0' || !payload.data) {
+    throw new Error(`OKX ${payload.msg || payload.code}`);
+  }
+
+  return payload.data
+    .map((row) => ({
+      time: Number(row[0]),
+      open: Number(row[1]),
+      high: Number(row[2]),
+      low: Number(row[3]),
+      close: Number(row[4]),
+    }))
+    .sort((a, b) => a.time - b.time);
+}
+
+async function fetchBinanceCandles(interval: KlineInterval, limit: number, signal: AbortSignal): Promise<Candle[]> {
+  const response = await fetch(
+    `https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=${interval}&limit=${limit}`,
+    { signal },
+  );
+
+  if (!response.ok) {
+    throw new Error(`Binance HTTP ${response.status}`);
+  }
+
+  const rows = (await response.json()) as Array<Array<number | string>>;
+  return rows.map((row) => ({
+    time: Number(row[0]),
+    open: Number(row[1]),
+    high: Number(row[2]),
+    low: Number(row[3]),
+    close: Number(row[4]),
+  }));
+}
 
 function readInitialState() {
   const stored = window.localStorage.getItem(storageKey);
@@ -108,8 +163,8 @@ function useBtcCandles(interval: KlineInterval) {
     const selectedInterval = intervalOptions.find((option) => option.value === interval) ?? intervalOptions[2];
 
     if (cachedCandles) {
-      setCandles(cachedCandles);
-      setStatus(`Binance BTC/USDT ${selectedInterval.label}`);
+      setCandles(cachedCandles.candles);
+      setStatus(`${cachedCandles.provider} BTC/USDT ${selectedInterval.label}`);
       setError('');
       setIsLoading(false);
       return;
@@ -125,38 +180,35 @@ function useBtcCandles(interval: KlineInterval) {
     async function load() {
       setIsLoading(true);
       setError('');
-      setStatus(`加载 Binance BTC/USDT ${selectedInterval.label}...`);
+      setStatus(`加载 OKX BTC/USDT ${selectedInterval.label}...`);
 
       try {
-        const response = await fetch(
-          `https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=${selectedInterval.value}&limit=${selectedInterval.limit}`,
-          { signal: controller.signal },
-        );
+        let provider: KlineProvider = 'OKX';
+        let nextCandles: Candle[];
 
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`);
+        try {
+          nextCandles = await fetchOkxCandles(interval, selectedInterval.limit, controller.signal);
+        } catch (okxError) {
+          if (controller.signal.aborted) {
+            throw okxError;
+          }
+
+          provider = 'Binance';
+          setStatus(`OKX 不可用，尝试 Binance BTC/USDT ${selectedInterval.label}...`);
+          nextCandles = await fetchBinanceCandles(interval, selectedInterval.limit, controller.signal);
         }
 
-        const rows = (await response.json()) as Array<Array<number | string>>;
-        const nextCandles = rows.map((row) => ({
-            time: Number(row[0]),
-            open: Number(row[1]),
-            high: Number(row[2]),
-            low: Number(row[3]),
-            close: Number(row[4]),
-          }));
-
-        klineCache.set(interval, nextCandles);
+        klineCache.set(interval, { candles: nextCandles, provider });
         setCandles(nextCandles);
-        setStatus(`Binance BTC/USDT ${selectedInterval.label}`);
+        setStatus(`${provider} BTC/USDT ${selectedInterval.label}`);
       } catch (error) {
         if (!controller.signal.aborted) {
           const message = error instanceof Error ? error.message : '未知错误';
           setError(`K 线加载失败：${message}`);
-          setStatus(`Binance BTC/USDT ${selectedInterval.label}`);
+          setStatus(`BTC/USDT ${selectedInterval.label}`);
         } else if (abortedByTimeout) {
           setError('K 线请求超时，请稍后重试。');
-          setStatus(`Binance BTC/USDT ${selectedInterval.label}`);
+          setStatus(`BTC/USDT ${selectedInterval.label}`);
         }
       } finally {
         window.clearTimeout(timeoutId);
