@@ -411,7 +411,7 @@ h2 {
 .chart-floating-controls {
   position: absolute;
   right: 12px;
-  bottom: 12px;
+  top: 78px;
   z-index: 2;
   display: flex;
   overflow: hidden;
