@@ -24,6 +24,7 @@ type PlanSettings = {
   existingBtc: number;
   targetBtc: number;
   availableUsdt: number;
+  targetDate: string;
 };
 
 type KlineInterval = '1h' | '4h' | '1d' | '1w' | '1M';
@@ -37,6 +38,7 @@ const defaultSettings: PlanSettings = {
   existingBtc: 0.16,
   targetBtc: 1,
   availableUsdt: 48600,
+  targetDate: '2026-12-31',
 };
 
 const intervalOptions: Array<{ label: string; value: KlineInterval; limit: number }> = [
@@ -242,6 +244,7 @@ function readInitialState() {
         ...defaultSettings,
         ...parsed.settings,
         availableUsdt: parsed.settings?.availableUsdt ?? legacyAvailableUsdt ?? defaultSettings.availableUsdt,
+        targetDate: parsed.settings?.targetDate ?? defaultSettings.targetDate,
       },
       trades: parsed.trades ?? [],
     };
@@ -360,6 +363,7 @@ function App() {
   const [trades, setTrades] = useState<Trade[]>(initialState.trades);
   const [draft, setDraft] = useState<TradeDraft>(defaultTradeDraft);
   const [interval, setInterval] = useState<KlineInterval>('1d');
+  const [showChart, setShowChart] = useState(true);
   const { candles, error, isLoading, status } = useBtcCandles(interval);
 
   const latestPrice = candles.length > 0 ? candles[candles.length - 1].close : draft.priceUsdt;
@@ -385,6 +389,17 @@ function App() {
     const averageGap = latestPrice - planTargetAverageUsdt;
     const priceVsRequired = requiredAverageFromNow > 0 ? latestPrice - requiredAverageFromNow : 0;
 
+    const today = new Date();
+    const targetDateObj = new Date(settings.targetDate || today.toISOString().slice(0, 10));
+    const weeksRemaining = Math.max(1, (targetDateObj.getTime() - today.getTime()) / (1000 * 60 * 60 * 24 * 7));
+    const weeklyBtc = remainingBtcToTarget / weeksRemaining;
+    const weeklyUsdt = weeklyBtc * latestPrice;
+
+    const totalRequiredUsdtAtCurrentPrice = remainingBtcToTarget * latestPrice;
+    const fundingGapUsdt = Math.max(0, totalRequiredUsdtAtCurrentPrice - remainingBudgetUsdt);
+    const affordableWeeklyUsdt = remainingBudgetUsdt / weeksRemaining;
+    const affordableWeeklyBtc = latestPrice > 0 ? affordableWeeklyUsdt / latestPrice : 0;
+
     return {
       buyCostUsdt,
       currentBtc,
@@ -397,6 +412,12 @@ function App() {
       totalBuyBtc,
       averageGap,
       priceVsRequired,
+      weeklyBtc,
+      weeklyUsdt,
+      weeksRemaining,
+      fundingGapUsdt,
+      affordableWeeklyUsdt,
+      affordableWeeklyBtc,
     };
   }, [latestPrice, settings, trades]);
 
@@ -484,13 +505,23 @@ function App() {
         <Metric label="后续买入均价" value={metrics.currentBuyAverage ? `${currency.format(metrics.currentBuyAverage)} USDT` : '暂无'} hint={`自动目标 ${currency.format(metrics.planTargetAverageUsdt)} USDT`} />
         <Metric label="剩余可用仓位" value={`${currency.format(metrics.remainingBudgetUsdt)} USDT`} hint={`已支出 ${currency.format(metrics.spentUsdt)} USDT`} />
         <Metric label="剩余所需均价" value={metrics.requiredAverageFromNow ? `${currency.format(metrics.requiredAverageFromNow)} USDT` : '已达标'} hint="剩余资金 / 剩余 BTC 缺口" />
+        <Metric label="每周建议定投" value={`${btcFormat.format(metrics.weeklyBtc)} BTC`} hint={
+          metrics.fundingGapUsdt > 0 ? (
+            <span style={{ color: '#ffb4b4' }}>
+              缺口 {currency.format(metrics.fundingGapUsdt)} USDT<br/>
+              按余量每周仅能投 {btcFormat.format(metrics.affordableWeeklyBtc)} BTC
+            </span>
+          ) : (
+            `约合 ${currency.format(metrics.weeklyUsdt)} USDT (现价)`
+          )
+        } />
       </section>
 
       <section className="layout">
         <div className="panel chart-panel">
           <div className="section-title">
             <div>
-              <h2>BTC/USDT K 线</h2>
+              <h2>BTC/USDT K 线 <button className="link-button" style={{ marginLeft: '12px', fontSize: '12px' }} onClick={() => setShowChart(!showChart)}>{showChart ? '隐藏' : '显示'}</button></h2>
               <p>{status}</p>
             </div>
             <div className="chart-actions">
@@ -509,13 +540,15 @@ function App() {
               <div className="price-pill">现价 {currency.format(latestPrice)} USDT</div>
             </div>
           </div>
-          <CandlestickChart
-            candles={candles}
-            trades={trades}
-            targetAverage={metrics.planTargetAverageUsdt}
-            requiredAverage={metrics.requiredAverageFromNow}
-          />
-          {error && <div className="chart-error">{error}</div>}
+          {showChart && (
+            <CandlestickChart
+              candles={candles}
+              trades={trades}
+              targetAverage={metrics.planTargetAverageUsdt}
+              requiredAverage={metrics.requiredAverageFromNow}
+            />
+          )}
+          {error && showChart && <div className="chart-error">{error}</div>}
         </div>
 
         <aside className="panel settings-panel">
@@ -523,6 +556,10 @@ function App() {
           <NumberField label="已有 BTC" value={settings.existingBtc} step="0.01" onChange={(value) => updateSetting('existingBtc', value)} />
           <NumberField label="目标 BTC" value={settings.targetBtc} step="0.01" onChange={(value) => updateSetting('targetBtc', value)} />
           <NumberField label="BTC 可用仓位 USDT" value={settings.availableUsdt} step="100" onChange={(value) => updateSetting('availableUsdt', value)} />
+          <label className="number-field">
+            目标日期
+            <input type="date" value={settings.targetDate} onChange={(event) => updateSetting('targetDate', event.target.value)} />
+          </label>
           <div className="computed-field">
             <span>自动目标均价</span>
             <strong>{currency.format(metrics.planTargetAverageUsdt)} USDT</strong>
@@ -630,7 +667,7 @@ function NumberField(props: { label: string; value: number; step: string; onChan
   );
 }
 
-function Metric(props: { label: string; value: string; hint: string }) {
+function Metric(props: { label: string; value: React.ReactNode; hint: React.ReactNode }) {
   return (
     <div className="metric-card panel">
       <span>{props.label}</span>
