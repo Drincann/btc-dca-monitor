@@ -8,7 +8,14 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "deploy": "npm run build && gh-pages -d dist"
+    "deploy": "npm run build && gh-pages -d dist",
+    "backtest:signals": "node scripts/backtest-signals.mjs",
+    "backtest:strategy": "node scripts/backtest-accumulation-strategies.mjs",
+    "backtest:regimes": "node scripts/backtest-regimes.mjs",
+    "backtest:report": "node scripts/generate-backtest-report.mjs",
+    "verify:policy": "node scripts/verify-backtest-policy.mjs",
+    "verify:runtime": "node scripts/verify-runtime-page.mjs",
+    "verify:all": "npm run backtest:report && npm run verify:policy && npm run build && npm run verify:runtime"
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",

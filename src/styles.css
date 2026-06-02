@@ -183,7 +183,8 @@ h2 {
   gap: 10px;
 }
 
-.interval-tabs {
+.interval-tabs,
+.layer-tabs {
   display: flex;
   overflow: hidden;
   border: 1px solid #242424;
@@ -191,7 +192,8 @@ h2 {
   background: #080808;
 }
 
-.interval-tabs button {
+.interval-tabs button,
+.layer-tabs button {
   min-width: 42px;
   border-right: 1px solid #242424;
   padding: 8px 10px;
@@ -201,24 +203,33 @@ h2 {
   font-weight: 650;
 }
 
-.interval-tabs button:last-child {
+.interval-tabs button:last-child,
+.layer-tabs button:last-child {
   border-right: 0;
 }
 
-.interval-tabs button.active {
+.interval-tabs button.active,
+.layer-tabs button.active {
   color: #000;
   background: #fff;
 }
 
-.interval-tabs button:disabled {
+.interval-tabs button:disabled,
+.layer-tabs button:disabled {
   cursor: not-allowed;
   opacity: 0.45;
 }
 
 .interval-tabs button:not(:disabled):not(.active):hover,
+.layer-tabs button:not(:disabled):not(.active):hover,
 .ghost-button:hover {
   color: #fff;
   background: #121212;
+}
+
+.layer-tabs button {
+  min-width: auto;
+  padding: 8px 9px;
 }
 
 .price-pill {
@@ -267,7 +278,8 @@ h2 {
 .kline-chart {
   display: block;
   width: 100%;
-  height: 420px;
+  height: auto;
+  min-height: 420px;
 }
 
 .kline-chart > rect {
@@ -322,6 +334,35 @@ h2 {
   fill: #ef4444;
 }
 
+.ma20-line,
+.ma60-line,
+.bollinger-line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ma20-line {
+  stroke: #66d9ef;
+  stroke-width: 1.8;
+}
+
+.ma60-line {
+  stroke: #c792ea;
+  stroke-width: 1.5;
+}
+
+.bollinger-line {
+  stroke: #f5c96a;
+  stroke-width: 1.2;
+  stroke-dasharray: 5 5;
+  opacity: 0.78;
+}
+
+.bollinger-lower {
+  opacity: 0.58;
+}
+
 .trade-buy circle {
   fill: #fff;
   stroke: #000;
@@ -337,6 +378,18 @@ h2 {
 .trade-buy text,
 .trade-sell text {
   fill: #fff;
+}
+
+.bottom-signal-marker path {
+  fill: #f5e8a6;
+  stroke: #000;
+  stroke-width: 2;
+}
+
+.bottom-signal-marker text {
+  fill: #f5e8a6;
+  font-size: 12px;
+  font-weight: 800;
 }
 
 .hover-layer line {
@@ -392,32 +445,51 @@ h2 {
   color: #fff;
 }
 
+.volume-pane-bg {
+  fill: rgba(255, 255, 255, 0.055);
+  stroke: rgba(255, 255, 255, 0.1);
+  stroke-width: 1;
+}
+
+.volume-pane-separator {
+  stroke: #4a4a4a;
+  stroke-width: 1;
+  stroke-dasharray: 3 5;
+}
+
+.volume-pane-label {
+  fill: #d8d8d8;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+.volume-pane-bar {
+  opacity: 0.9;
+}
+
+.volume-pane-bar-up {
+  fill: #3df0a0;
+}
+
+.volume-pane-bar-down {
+  fill: #ff6f6f;
+}
+
 .chart-reference-panel {
-  position: absolute;
-  right: 12px;
-  top: 12px;
-  z-index: 2;
-  display: grid;
+  display: flex;
+  flex-wrap: wrap;
   gap: 7px;
-  border: 1px solid #2a2a2a;
-  border-radius: 6px;
-  padding: 9px 10px;
   color: #9a9a9a;
-  background: rgba(0, 0, 0, 0.88);
   font-size: 12px;
-  pointer-events: none;
 }
 
 .chart-floating-controls {
-  position: absolute;
-  right: 12px;
-  top: 78px;
-  z-index: 2;
   display: flex;
   overflow: hidden;
   border: 1px solid #2a2a2a;
   border-radius: 6px;
-  background: rgba(0, 0, 0, 0.88);
+  background: #070707;
 }
 
 .chart-floating-controls button {
@@ -443,6 +515,11 @@ h2 {
   display: flex;
   align-items: center;
   gap: 8px;
+  min-height: 34px;
+  border: 1px solid #242424;
+  border-radius: 6px;
+  padding: 7px 9px;
+  background: #070707;
 }
 
 .chart-reference-panel strong {
@@ -456,12 +533,28 @@ h2 {
   display: inline-block;
 }
 
+.chart-footer {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 10px;
+}
+
 .required-swatch {
   background: #fff;
 }
 
 .target-swatch {
   background: repeating-linear-gradient(90deg, #777 0 5px, transparent 5px 9px);
+}
+
+.ma20-swatch {
+  background: linear-gradient(90deg, #66d9ef 0 50%, #c792ea 50% 100%);
+}
+
+.bollinger-swatch {
+  background: repeating-linear-gradient(90deg, #f5c96a 0 4px, transparent 4px 8px);
 }
 
 .chart-error {
@@ -580,6 +673,397 @@ select:hover {
   line-height: 1.7;
 }
 
+.action-summary {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.action-focus {
+  display: grid;
+  gap: 7px;
+  border: 1px solid #242424;
+  border-radius: 8px;
+  padding: 14px;
+  background: #080808;
+}
+
+.action-focus span,
+.action-facts span,
+.action-reasons span {
+  color: #858585;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.action-focus strong {
+  color: #fff;
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.action-facts {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.action-facts div {
+  display: grid;
+  gap: 5px;
+  border: 1px solid #1f1f1f;
+  border-radius: 7px;
+  padding: 10px;
+  background: #070707;
+}
+
+.action-facts strong {
+  color: #fff;
+  font-size: 13px;
+}
+
+.action-reasons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.action-reasons span {
+  border: 1px solid #282828;
+  border-radius: 999px;
+  padding: 5px 8px;
+  background: #060606;
+}
+
+.research-toggle {
+  width: 100%;
+  border: 1px solid #2a2a2a;
+  border-radius: 7px;
+  padding: 10px 12px;
+  color: #ededed;
+  background: #080808;
+  font-size: 13px;
+  font-weight: 750;
+}
+
+.research-toggle:hover {
+  color: #000;
+  background: #fff;
+}
+
+.research-stack {
+  margin-top: 14px;
+}
+
+.decision-card {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+  border: 1px solid #242424;
+  border-radius: 8px;
+  padding: 14px;
+  background: #070707;
+}
+
+.decision-card div {
+  display: grid;
+  gap: 6px;
+}
+
+.decision-card span {
+  width: fit-content;
+  border-radius: 999px;
+  padding: 3px 8px;
+  color: #858585;
+  background: #1a1a1a;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.decision-card strong {
+  color: #fff;
+  font-size: 18px;
+}
+
+.decision-card p {
+  margin: 0;
+  border-left: 0;
+  padding-left: 0;
+}
+
+.decision-card small {
+  color: #aaa;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.decision-card-buy {
+  border-color: #2f6b4f;
+  background: #06120c;
+}
+
+.decision-card-buy span {
+  color: #071510;
+  background: #5df2a5;
+}
+
+.decision-card-watch {
+  border-color: #54491f;
+  background: #110f06;
+}
+
+.decision-card-watch span {
+  color: #201500;
+  background: #f5c96a;
+}
+
+.signal-card {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+  border: 1px solid #242424;
+  border-radius: 8px;
+  padding: 13px;
+  background: #080808;
+}
+
+.signal-card p {
+  margin: 0;
+  border-left: 0;
+  padding-left: 0;
+}
+
+.signal-card small {
+  color: #868686;
+  font-size: 12px;
+}
+
+.signal-card-header {
+  display: grid;
+  gap: 5px;
+}
+
+.signal-card-header span {
+  width: fit-content;
+  border: 1px solid #303030;
+  border-radius: 999px;
+  padding: 3px 8px;
+  color: #aaa;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.signal-card-header strong {
+  color: #fff;
+  font-size: 16px;
+}
+
+.signal-card-buy {
+  border-color: #2f6b4f;
+  background: #07130d;
+}
+
+.signal-card-buy .signal-card-header span {
+  color: #b7f7d2;
+  border-color: #2f6b4f;
+}
+
+.signal-card-watch {
+  border-color: #54491f;
+  background: #110f06;
+}
+
+.signal-card-watch .signal-card-header span {
+  color: #f5e8a6;
+  border-color: #54491f;
+}
+
+.signal-checks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.signal-check {
+  border: 1px solid #282828;
+  border-radius: 999px;
+  padding: 5px 8px;
+  color: #777;
+  background: #050505;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.signal-check.active {
+  color: #000;
+  background: #fff;
+}
+
+.backtest-card {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+  border: 1px solid #242424;
+  border-radius: 8px;
+  padding: 13px;
+  background: #060606;
+}
+
+.backtest-card p {
+  margin: 0;
+  border-left: 0;
+  padding-left: 0;
+}
+
+.backtest-warning {
+  color: #f5e8a6;
+  font-size: 12px;
+}
+
+.backtest-note {
+  color: #aaa;
+  font-size: 12px;
+}
+
+.backtest-explain {
+  display: grid;
+  gap: 5px;
+  border: 1px solid #1f1f1f;
+  border-radius: 7px;
+  padding: 9px 10px;
+  background: #090909;
+}
+
+.backtest-explain span {
+  color: #909090;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.backtest-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.backtest-header strong {
+  color: #fff;
+}
+
+.backtest-header span {
+  color: #858585;
+  font-size: 12px;
+}
+
+.backtest-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+}
+
+.backtest-grid div {
+  display: grid;
+  gap: 4px;
+  border: 1px solid #1f1f1f;
+  border-radius: 7px;
+  padding: 10px;
+  background: #090909;
+}
+
+.backtest-grid span,
+.backtest-grid small {
+  color: #858585;
+  font-size: 12px;
+}
+
+.backtest-grid strong {
+  color: #fff;
+  font-size: 18px;
+}
+
+.strategy-backtest-list {
+  display: grid;
+  gap: 7px;
+}
+
+.strategy-backtest-list div {
+  display: grid;
+  gap: 3px;
+  border: 1px solid #1f1f1f;
+  border-radius: 7px;
+  padding: 9px 10px;
+  background: #090909;
+}
+
+.strategy-backtest-list strong {
+  color: #fff;
+}
+
+.strategy-backtest-list span {
+  color: #dedede;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.strategy-backtest-list small {
+  color: #858585;
+  font-size: 12px;
+}
+
+.timeframe-signal-list {
+  display: grid;
+  gap: 8px;
+}
+
+.timeframe-signal-list div {
+  display: grid;
+  grid-template-columns: 42px 54px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  padding: 9px 10px;
+  border: 1px solid #1f1f1f;
+  border-radius: 7px;
+  background: #090909;
+}
+
+.timeframe-signal-list strong {
+  color: #fff;
+  font-size: 13px;
+}
+
+.timeframe-signal-list small {
+  color: #858585;
+  font-size: 12px;
+}
+
+.timeframe-signal-list small:last-child {
+  grid-column: 3;
+}
+
+.timeframe-action {
+  justify-self: start;
+  padding: 3px 7px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.timeframe-action-buy {
+  color: #071510;
+  background: #5df2a5;
+}
+
+.timeframe-action-watch {
+  color: #201500;
+  background: #f5c96a;
+}
+
+.timeframe-action-wait {
+  color: #858585;
+  background: #1a1a1a;
+}
+
 .table-wrap {
   overflow-x: auto;
 }
@@ -666,6 +1150,27 @@ td {
   .section-title,
   .chart-actions {
     flex-direction: column;
+  }
+
+  .chart-actions,
+  .chart-footer {
+    align-items: stretch;
+  }
+
+  .chart-footer {
+    flex-direction: column;
+  }
+
+  .layer-tabs,
+  .interval-tabs,
+  .chart-floating-controls {
+    width: 100%;
+  }
+
+  .layer-tabs button,
+  .interval-tabs button,
+  .chart-floating-controls button {
+    flex: 1;
   }
 
   .metrics-grid,

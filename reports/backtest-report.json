@@ -1,0 +1,2589 @@
+{
+  "generatedAt": "2026-06-02T16:57:48.176Z",
+  "targetBtc": 0.83223,
+  "windowDays": 150,
+  "signals": {
+    "ranges": {
+      "4h": {
+        "start": "2020-12-01",
+        "end": "2026-06-02"
+      },
+      "1d": {
+        "start": "2020-12-01",
+        "end": "2026-06-02"
+      },
+      "1w": {
+        "start": "2020-12-07",
+        "end": "2026-06-01"
+      }
+    },
+    "results": [
+      {
+        "interval": "4h",
+        "name": "20日新低放量收回",
+        "signals": 161,
+        "latestSignal": "2026-05-28",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 160,
+            "winRate": 0.6125,
+            "averageReturn": 0.012016216832940943,
+            "medianReturn": 0.015894998647623493,
+            "p25Return": -0.03044822204222719
+          },
+          {
+            "days": 14,
+            "samples": 160,
+            "winRate": 0.5375,
+            "averageReturn": 0.014137922421060743,
+            "medianReturn": 0.006805200154519086,
+            "p25Return": -0.05932738814173075
+          },
+          {
+            "days": 30,
+            "samples": 158,
+            "winRate": 0.46835443037974683,
+            "averageReturn": 0.023241375191666153,
+            "medianReturn": -0.008635972263096248,
+            "p25Return": -0.10192710804891061
+          }
+        ],
+        "score": 0.014250355355222026,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [
+            {
+              "year": 2020,
+              "samples": 1,
+              "averageReturn": 1.0954688002902733,
+              "winRate": 1
+            },
+            {
+              "year": 2021,
+              "samples": 30,
+              "averageReturn": 0.03049224326411733,
+              "winRate": 0.3333333333333333
+            },
+            {
+              "year": 2022,
+              "samples": 32,
+              "averageReturn": -0.022346506702537714,
+              "winRate": 0.4375
+            },
+            {
+              "year": 2023,
+              "samples": 19,
+              "averageReturn": 0.04686317028232549,
+              "winRate": 0.47368421052631576
+            },
+            {
+              "year": 2024,
+              "samples": 34,
+              "averageReturn": 0.08308701826624175,
+              "winRate": 0.6470588235294118
+            },
+            {
+              "year": 2025,
+              "samples": 31,
+              "averageReturn": -0.01498583400754452,
+              "winRate": 0.45161290322580644
+            },
+            {
+              "year": 2026,
+              "samples": 11,
+              "averageReturn": -0.07943714596653238,
+              "winRate": 0.36363636363636365
+            }
+          ],
+          "validYears": 6,
+          "positiveYears": 3,
+          "positiveYearRate": 0.5,
+          "worstYearReturn": -0.07943714596653238
+        },
+        "finding": "只作辅助，不单独触发"
+      },
+      {
+        "interval": "4h",
+        "name": "布林下轨放量收回",
+        "signals": 178,
+        "latestSignal": "2026-05-23",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 178,
+            "winRate": 0.5617977528089888,
+            "averageReturn": 0.007922139151607761,
+            "medianReturn": 0.007367250872112487,
+            "p25Return": -0.02787422517731683
+          },
+          {
+            "days": 14,
+            "samples": 177,
+            "winRate": 0.5536723163841808,
+            "averageReturn": 0.018297882307141192,
+            "medianReturn": 0.005324943476049368,
+            "p25Return": -0.04389450717285765
+          },
+          {
+            "days": 30,
+            "samples": 174,
+            "winRate": 0.4827586206896552,
+            "averageReturn": 0.02972229633597376,
+            "medianReturn": -0.002324845749299882,
+            "p25Return": -0.1066983356884662
+          }
+        ],
+        "score": 0.021565968148077434,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [
+            {
+              "year": 2020,
+              "samples": 1,
+              "averageReturn": 1.262909462618423,
+              "winRate": 1
+            },
+            {
+              "year": 2021,
+              "samples": 24,
+              "averageReturn": 0.10353934654123637,
+              "winRate": 0.4166666666666667
+            },
+            {
+              "year": 2022,
+              "samples": 38,
+              "averageReturn": -0.05058964619080209,
+              "winRate": 0.34210526315789475
+            },
+            {
+              "year": 2023,
+              "samples": 28,
+              "averageReturn": 0.06477924364321495,
+              "winRate": 0.5357142857142857
+            },
+            {
+              "year": 2024,
+              "samples": 36,
+              "averageReturn": 0.0801407249754658,
+              "winRate": 0.6944444444444444
+            },
+            {
+              "year": 2025,
+              "samples": 36,
+              "averageReturn": -0.02903758709779787,
+              "winRate": 0.3888888888888889
+            },
+            {
+              "year": 2026,
+              "samples": 11,
+              "averageReturn": -0.027936313409476665,
+              "winRate": 0.5454545454545454
+            }
+          ],
+          "validYears": 6,
+          "positiveYears": 3,
+          "positiveYearRate": 0.5,
+          "worstYearReturn": -0.05058964619080209
+        },
+        "finding": "需多周期确认"
+      },
+      {
+        "interval": "4h",
+        "name": "RSI超卖反转",
+        "signals": 204,
+        "latestSignal": "2026-05-28",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 203,
+            "winRate": 0.5615763546798029,
+            "averageReturn": 0.011477835777894912,
+            "medianReturn": 0.007143387021465037,
+            "p25Return": -0.028917566499868243
+          },
+          {
+            "days": 14,
+            "samples": 202,
+            "winRate": 0.5693069306930693,
+            "averageReturn": 0.0170543526065781,
+            "medianReturn": 0.009967407401508583,
+            "p25Return": -0.04711565729499784
+          },
+          {
+            "days": 30,
+            "samples": 201,
+            "winRate": 0.5223880597014925,
+            "averageReturn": 0.0347911554407547,
+            "medianReturn": 0.011190356024885958,
+            "p25Return": -0.08606329429266536
+          }
+        ],
+        "score": 0.024398942176792775,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [
+            {
+              "year": 2020,
+              "samples": 1,
+              "averageReturn": 1.262909462618423,
+              "winRate": 1
+            },
+            {
+              "year": 2021,
+              "samples": 35,
+              "averageReturn": 0.06673709778027163,
+              "winRate": 0.34285714285714286
+            },
+            {
+              "year": 2022,
+              "samples": 42,
+              "averageReturn": -0.022064277624674243,
+              "winRate": 0.4523809523809524
+            },
+            {
+              "year": 2023,
+              "samples": 32,
+              "averageReturn": 0.11327383476276245,
+              "winRate": 0.6875
+            },
+            {
+              "year": 2024,
+              "samples": 34,
+              "averageReturn": 0.05757950420793766,
+              "winRate": 0.6764705882352942
+            },
+            {
+              "year": 2025,
+              "samples": 42,
+              "averageReturn": -0.006720325557158228,
+              "winRate": 0.47619047619047616
+            },
+            {
+              "year": 2026,
+              "samples": 15,
+              "averageReturn": -0.0652798775451699,
+              "winRate": 0.5333333333333333
+            }
+          ],
+          "validYears": 6,
+          "positiveYears": 3,
+          "positiveYearRate": 0.5,
+          "worstYearReturn": -0.0652798775451699
+        },
+        "finding": "需多周期确认"
+      },
+      {
+        "interval": "4h",
+        "name": "RSI+布林反转",
+        "signals": 374,
+        "latestSignal": "2026-05-28",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 372,
+            "winRate": 0.543010752688172,
+            "averageReturn": 0.004429875126373797,
+            "medianReturn": 0.006746503690171904,
+            "p25Return": -0.03330395957229816
+          },
+          {
+            "days": 14,
+            "samples": 370,
+            "winRate": 0.5243243243243243,
+            "averageReturn": 0.011542691812731107,
+            "medianReturn": 0.0038423131989265,
+            "p25Return": -0.048448378136051094
+          },
+          {
+            "days": 30,
+            "samples": 365,
+            "winRate": 0.4986301369863014,
+            "averageReturn": 0.026535072168953885,
+            "medianReturn": -0.002324845749299882,
+            "p25Return": -0.10199973169606254
+          }
+        ],
+        "score": 0.013524535242897685,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [
+            {
+              "year": 2020,
+              "samples": 2,
+              "averageReturn": 1.2270741657777537,
+              "winRate": 1
+            },
+            {
+              "year": 2021,
+              "samples": 65,
+              "averageReturn": 0.031007083793805887,
+              "winRate": 0.3230769230769231
+            },
+            {
+              "year": 2022,
+              "samples": 74,
+              "averageReturn": -0.033460723466040045,
+              "winRate": 0.4594594594594595
+            },
+            {
+              "year": 2023,
+              "samples": 67,
+              "averageReturn": 0.05456663698856288,
+              "winRate": 0.5223880597014925
+            },
+            {
+              "year": 2024,
+              "samples": 61,
+              "averageReturn": 0.09140507984448488,
+              "winRate": 0.6885245901639344
+            },
+            {
+              "year": 2025,
+              "samples": 72,
+              "averageReturn": -0.008437350936558386,
+              "winRate": 0.4722222222222222
+            },
+            {
+              "year": 2026,
+              "samples": 24,
+              "averageReturn": -0.038849965888034674,
+              "winRate": 0.5833333333333334
+            }
+          ],
+          "validYears": 7,
+          "positiveYears": 4,
+          "positiveYearRate": 0.5714285714285714,
+          "worstYearReturn": -0.038849965888034674
+        },
+        "finding": "只作辅助，不单独触发"
+      },
+      {
+        "interval": "4h",
+        "name": "短跌过度反转",
+        "signals": 80,
+        "latestSignal": "2026-02-06",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 80,
+            "winRate": 0.6,
+            "averageReturn": 0.008681711525495002,
+            "medianReturn": 0.010262313840021365,
+            "p25Return": -0.03551986464749587
+          },
+          {
+            "days": 14,
+            "samples": 80,
+            "winRate": 0.5375,
+            "averageReturn": 0.021657723180365497,
+            "medianReturn": 0.008057623004773562,
+            "p25Return": -0.048315189452399925
+          },
+          {
+            "days": 30,
+            "samples": 80,
+            "winRate": 0.5,
+            "averageReturn": 0.0583859892321004,
+            "medianReturn": 0.0008634875406479415,
+            "p25Return": -0.07331040211279605
+          }
+        ],
+        "score": 0.030815856506207613,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [
+            {
+              "year": 2020,
+              "samples": 1,
+              "averageReturn": 1.262909462618423,
+              "winRate": 1
+            },
+            {
+              "year": 2021,
+              "samples": 34,
+              "averageReturn": 0.070766579304879,
+              "winRate": 0.38235294117647056
+            },
+            {
+              "year": 2022,
+              "samples": 22,
+              "averageReturn": 0.006605775604661848,
+              "winRate": 0.5454545454545454
+            },
+            {
+              "year": 2023,
+              "samples": 3,
+              "averageReturn": 0.11597857374303398,
+              "winRate": 0.6666666666666666
+            },
+            {
+              "year": 2024,
+              "samples": 7,
+              "averageReturn": 0.08015270522241795,
+              "winRate": 0.8571428571428571
+            },
+            {
+              "year": 2025,
+              "samples": 11,
+              "averageReturn": 0.002664547165645629,
+              "winRate": 0.45454545454545453
+            },
+            {
+              "year": 2026,
+              "samples": 2,
+              "averageReturn": -0.040867880163484596,
+              "winRate": 0.5
+            }
+          ],
+          "validYears": 6,
+          "positiveYears": 5,
+          "positiveYearRate": 0.8333333333333334,
+          "worstYearReturn": -0.040867880163484596
+        },
+        "finding": "需多周期确认"
+      },
+      {
+        "interval": "4h",
+        "name": "三日止跌放量长下影",
+        "signals": 177,
+        "latestSignal": "2026-05-28",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 176,
+            "winRate": 0.5170454545454546,
+            "averageReturn": -0.002899077669491153,
+            "medianReturn": 0.004155878065232055,
+            "p25Return": -0.04775041343712193
+          },
+          {
+            "days": 14,
+            "samples": 175,
+            "winRate": 0.49714285714285716,
+            "averageReturn": -0.006125266049074071,
+            "medianReturn": -0.0010514426446931646,
+            "p25Return": -0.062234113282190306
+          },
+          {
+            "days": 30,
+            "samples": 173,
+            "winRate": 0.47398843930635837,
+            "averageReturn": -0.004415412650380782,
+            "medianReturn": -0.01288873473790855,
+            "p25Return": -0.11234324985800062
+          }
+        ],
+        "score": -0.009623350355148972,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [
+            {
+              "year": 2021,
+              "samples": 25,
+              "averageReturn": 0.015188706365443425,
+              "winRate": 0.36
+            },
+            {
+              "year": 2022,
+              "samples": 42,
+              "averageReturn": -0.082940832397343,
+              "winRate": 0.35714285714285715
+            },
+            {
+              "year": 2023,
+              "samples": 32,
+              "averageReturn": 0.07278152606422318,
+              "winRate": 0.59375
+            },
+            {
+              "year": 2024,
+              "samples": 25,
+              "averageReturn": 0.07372729717580831,
+              "winRate": 0.68
+            },
+            {
+              "year": 2025,
+              "samples": 32,
+              "averageReturn": -0.017023136412522788,
+              "winRate": 0.46875
+            },
+            {
+              "year": 2026,
+              "samples": 17,
+              "averageReturn": -0.075736469718422,
+              "winRate": 0.4117647058823529
+            }
+          ],
+          "validYears": 6,
+          "positiveYears": 3,
+          "positiveYearRate": 0.5,
+          "worstYearReturn": -0.082940832397343
+        },
+        "finding": "暂不采用"
+      },
+      {
+        "interval": "4h",
+        "name": "恐慌长下影",
+        "signals": 60,
+        "latestSignal": "2026-02-06",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 60,
+            "winRate": 0.5166666666666667,
+            "averageReturn": 0.0012348797922859395,
+            "medianReturn": 0.0046529555260325355,
+            "p25Return": -0.06432452342191664
+          },
+          {
+            "days": 14,
+            "samples": 60,
+            "winRate": 0.48333333333333334,
+            "averageReturn": 0.010522977194728242,
+            "medianReturn": -0.000006992532887043578,
+            "p25Return": -0.06167257019314149
+          },
+          {
+            "days": 30,
+            "samples": 60,
+            "winRate": 0.36666666666666664,
+            "averageReturn": 0.026142953013869465,
+            "medianReturn": -0.02044731432189532,
+            "p25Return": -0.08603026675361561
+          }
+        ],
+        "score": 0.006951567677030701,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [
+            {
+              "year": 2021,
+              "samples": 21,
+              "averageReturn": 0.052227445027219564,
+              "winRate": 0.38095238095238093
+            },
+            {
+              "year": 2022,
+              "samples": 14,
+              "averageReturn": 0.010002402210646794,
+              "winRate": 0.35714285714285715
+            },
+            {
+              "year": 2023,
+              "samples": 2,
+              "averageReturn": 0.2076414590681918,
+              "winRate": 1
+            },
+            {
+              "year": 2024,
+              "samples": 12,
+              "averageReturn": 0.04537592741943471,
+              "winRate": 0.5
+            },
+            {
+              "year": 2025,
+              "samples": 8,
+              "averageReturn": -0.06021100046976572,
+              "winRate": 0
+            },
+            {
+              "year": 2026,
+              "samples": 3,
+              "averageReturn": -0.0487796130333242,
+              "winRate": 0.3333333333333333
+            }
+          ],
+          "validYears": 6,
+          "positiveYears": 4,
+          "positiveYearRate": 0.6666666666666666,
+          "worstYearReturn": -0.06021100046976572
+        },
+        "finding": "只作辅助，不单独触发"
+      },
+      {
+        "interval": "4h",
+        "name": "应用综合信号",
+        "signals": 488,
+        "latestSignal": "2026-05-28",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 486,
+            "winRate": 0.5205761316872428,
+            "averageReturn": 0.0046471276667030565,
+            "medianReturn": 0.0034968316594930046,
+            "p25Return": -0.03190324507266574
+          },
+          {
+            "days": 14,
+            "samples": 485,
+            "winRate": 0.51340206185567,
+            "averageReturn": 0.012337864080339512,
+            "medianReturn": 0.002727914053396045,
+            "p25Return": -0.04765274820957942
+          },
+          {
+            "days": 30,
+            "samples": 480,
+            "winRate": 0.5041666666666667,
+            "averageReturn": 0.021586545132608,
+            "medianReturn": 0.0024948931119534545,
+            "p25Return": -0.09700854489200439
+          }
+        ],
+        "score": 0.010903357198479634,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [
+            {
+              "year": 2020,
+              "samples": 2,
+              "averageReturn": 1.2363204876220069,
+              "winRate": 1
+            },
+            {
+              "year": 2021,
+              "samples": 83,
+              "averageReturn": 0.0295874676259529,
+              "winRate": 0.3493975903614458
+            },
+            {
+              "year": 2022,
+              "samples": 106,
+              "averageReturn": -0.037263166340545203,
+              "winRate": 0.4716981132075472
+            },
+            {
+              "year": 2023,
+              "samples": 88,
+              "averageReturn": 0.06114812984747573,
+              "winRate": 0.5568181818181818
+            },
+            {
+              "year": 2024,
+              "samples": 82,
+              "averageReturn": 0.07220254287178392,
+              "winRate": 0.6463414634146342
+            },
+            {
+              "year": 2025,
+              "samples": 88,
+              "averageReturn": -0.007527063422329084,
+              "winRate": 0.4772727272727273
+            },
+            {
+              "year": 2026,
+              "samples": 31,
+              "averageReturn": -0.04052341462411799,
+              "winRate": 0.5483870967741935
+            }
+          ],
+          "validYears": 7,
+          "positiveYears": 4,
+          "positiveYearRate": 0.5714285714285714,
+          "worstYearReturn": -0.04052341462411799
+        },
+        "finding": "只作辅助，不单独触发"
+      },
+      {
+        "interval": "1d",
+        "name": "20日新低放量收回",
+        "signals": 16,
+        "latestSignal": "2026-02-06",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 16,
+            "winRate": 0.4375,
+            "averageReturn": -0.015032879365598871,
+            "medianReturn": -0.0017298135045513043,
+            "p25Return": -0.047588181892965487
+          },
+          {
+            "days": 14,
+            "samples": 16,
+            "winRate": 0.4375,
+            "averageReturn": -0.040185542497325574,
+            "medianReturn": -0.0043478394886825675,
+            "p25Return": -0.12342976231209571
+          },
+          {
+            "days": 30,
+            "samples": 16,
+            "winRate": 0.375,
+            "averageReturn": -0.040846001289601544,
+            "medianReturn": -0.020842411663896495,
+            "p25Return": -0.08008125572889138
+          }
+        ],
+        "score": -0.04975397556012471,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [
+            {
+              "year": 2021,
+              "samples": 2,
+              "averageReturn": -0.1455944853640492,
+              "winRate": 0
+            },
+            {
+              "year": 2022,
+              "samples": 6,
+              "averageReturn": -0.021552375418424127,
+              "winRate": 0.5
+            },
+            {
+              "year": 2023,
+              "samples": 1,
+              "averageReturn": 0.09788256222530373,
+              "winRate": 1
+            },
+            {
+              "year": 2024,
+              "samples": 1,
+              "averageReturn": 0.07098561519658998,
+              "winRate": 1
+            },
+            {
+              "year": 2025,
+              "samples": 3,
+              "averageReturn": 0.0407947601871943,
+              "winRate": 0.3333333333333333
+            },
+            {
+              "year": 2026,
+              "samples": 3,
+              "averageReturn": -0.1747617517928194,
+              "winRate": 0
+            }
+          ],
+          "validYears": 4,
+          "positiveYears": 1,
+          "positiveYearRate": 0.25,
+          "worstYearReturn": -0.1747617517928194
+        },
+        "finding": "暂不采用"
+      },
+      {
+        "interval": "1d",
+        "name": "布林下轨放量收回",
+        "signals": 19,
+        "latestSignal": "2026-02-06",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 19,
+            "winRate": 0.42105263157894735,
+            "averageReturn": 0.007983904384060936,
+            "medianReturn": -0.010917546562154485,
+            "p25Return": -0.047588181892965487
+          },
+          {
+            "days": 14,
+            "samples": 19,
+            "winRate": 0.47368421052631576,
+            "averageReturn": -0.0040126060405182825,
+            "medianReturn": -0.018103861594178938,
+            "p25Return": -0.05232408797325631
+          },
+          {
+            "days": 30,
+            "samples": 19,
+            "winRate": 0.3684210526315789,
+            "averageReturn": -0.018511720234855353,
+            "medianReturn": -0.04661775546338431,
+            "p25Return": -0.1244346928341456
+          }
+        ],
+        "score": -0.015628596575135212,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [
+            {
+              "year": 2021,
+              "samples": 4,
+              "averageReturn": 0.02969356968255868,
+              "winRate": 0.25
+            },
+            {
+              "year": 2022,
+              "samples": 5,
+              "averageReturn": -0.03283749354929267,
+              "winRate": 0.6
+            },
+            {
+              "year": 2023,
+              "samples": 1,
+              "averageReturn": 0.09788256222530373,
+              "winRate": 1
+            },
+            {
+              "year": 2024,
+              "samples": 3,
+              "averageReturn": -0.026290727521949334,
+              "winRate": 0.3333333333333333
+            },
+            {
+              "year": 2025,
+              "samples": 4,
+              "averageReturn": -0.0051005505817804594,
+              "winRate": 0.25
+            },
+            {
+              "year": 2026,
+              "samples": 2,
+              "averageReturn": -0.15245883638917848,
+              "winRate": 0
+            }
+          ],
+          "validYears": 5,
+          "positiveYears": 1,
+          "positiveYearRate": 0.2,
+          "worstYearReturn": -0.15245883638917848
+        },
+        "finding": "暂不采用"
+      },
+      {
+        "interval": "1d",
+        "name": "RSI超卖反转",
+        "signals": 26,
+        "latestSignal": "2026-02-02",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 26,
+            "winRate": 0.6153846153846154,
+            "averageReturn": 0.023963048377597922,
+            "medianReturn": 0.03281047126440262,
+            "p25Return": -0.049267839623516684
+          },
+          {
+            "days": 14,
+            "samples": 26,
+            "winRate": 0.5384615384615384,
+            "averageReturn": 0.02225370006199529,
+            "medianReturn": 0.008812460037446282,
+            "p25Return": -0.04392802679812093
+          },
+          {
+            "days": 30,
+            "samples": 26,
+            "winRate": 0.5384615384615384,
+            "averageReturn": 0.057011557013687764,
+            "medianReturn": 0.005577178587750267,
+            "p25Return": -0.03129223811248068
+          }
+        ],
+        "score": 0.031069352454223535,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [
+            {
+              "year": 2021,
+              "samples": 3,
+              "averageReturn": 0.3841707190781653,
+              "winRate": 0.6666666666666666
+            },
+            {
+              "year": 2022,
+              "samples": 9,
+              "averageReturn": -0.02614887641087152,
+              "winRate": 0.3333333333333333
+            },
+            {
+              "year": 2023,
+              "samples": 3,
+              "averageReturn": 0.0016368360587418172,
+              "winRate": 0.6666666666666666
+            },
+            {
+              "year": 2024,
+              "samples": 5,
+              "averageReturn": 0.0775356167057429,
+              "winRate": 0.8
+            },
+            {
+              "year": 2025,
+              "samples": 5,
+              "averageReturn": 0.04993070092668854,
+              "winRate": 0.6
+            },
+            {
+              "year": 2026,
+              "samples": 1,
+              "averageReturn": -0.07711388351915276,
+              "winRate": 0
+            }
+          ],
+          "validYears": 5,
+          "positiveYears": 4,
+          "positiveYearRate": 0.8,
+          "worstYearReturn": -0.02614887641087152
+        },
+        "finding": "可作为下一笔买入确认"
+      },
+      {
+        "interval": "1d",
+        "name": "RSI+布林反转",
+        "signals": 39,
+        "latestSignal": "2026-02-25",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 39,
+            "winRate": 0.5384615384615384,
+            "averageReturn": 0.011974816336508931,
+            "medianReturn": 0.00533054956953214,
+            "p25Return": -0.021473615673307026
+          },
+          {
+            "days": 14,
+            "samples": 39,
+            "winRate": 0.5384615384615384,
+            "averageReturn": 0.006678232144891059,
+            "medianReturn": 0.013086468257009437,
+            "p25Return": -0.05693946134201462
+          },
+          {
+            "days": 30,
+            "samples": 39,
+            "winRate": 0.48717948717948717,
+            "averageReturn": 0.02735954887700683,
+            "medianReturn": -0.023250559951426678,
+            "p25Return": -0.08008125572889138
+          }
+        ],
+        "score": 0.012641274280176806,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [
+            {
+              "year": 2021,
+              "samples": 7,
+              "averageReturn": 0.21623239198156938,
+              "winRate": 0.5714285714285714
+            },
+            {
+              "year": 2022,
+              "samples": 10,
+              "averageReturn": -0.058220307364352575,
+              "winRate": 0.4
+            },
+            {
+              "year": 2023,
+              "samples": 3,
+              "averageReturn": 0.12058543035441882,
+              "winRate": 1
+            },
+            {
+              "year": 2024,
+              "samples": 4,
+              "averageReturn": 0.03199703936565592,
+              "winRate": 0.75
+            },
+            {
+              "year": 2025,
+              "samples": 12,
+              "averageReturn": -0.0011804992541697423,
+              "winRate": 0.4166666666666667
+            },
+            {
+              "year": 2026,
+              "samples": 3,
+              "averageReturn": -0.11332657383334545,
+              "winRate": 0
+            }
+          ],
+          "validYears": 6,
+          "positiveYears": 3,
+          "positiveYearRate": 0.5,
+          "worstYearReturn": -0.11332657383334545
+        },
+        "finding": "只作辅助，不单独触发"
+      },
+      {
+        "interval": "1d",
+        "name": "短跌过度反转",
+        "signals": 69,
+        "latestSignal": "2026-03-31",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 69,
+            "winRate": 0.4782608695652174,
+            "averageReturn": -0.00047202696100871803,
+            "medianReturn": -0.0026281459284177066,
+            "p25Return": -0.047588181892965487
+          },
+          {
+            "days": 14,
+            "samples": 69,
+            "winRate": 0.5217391304347826,
+            "averageReturn": 0.013027366537849057,
+            "medianReturn": 0.01896401967097741,
+            "p25Return": -0.04330702257357457
+          },
+          {
+            "days": 30,
+            "samples": 69,
+            "winRate": 0.5217391304347826,
+            "averageReturn": 0.03199288476996363,
+            "medianReturn": 0.012297308224190943,
+            "p25Return": -0.09554496690787578
+          }
+        ],
+        "score": 0.016203958457807286,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [
+            {
+              "year": 2021,
+              "samples": 18,
+              "averageReturn": 0.12448168174973641,
+              "winRate": 0.6111111111111112
+            },
+            {
+              "year": 2022,
+              "samples": 24,
+              "averageReturn": -0.0063729725656888475,
+              "winRate": 0.4583333333333333
+            },
+            {
+              "year": 2023,
+              "samples": 2,
+              "averageReturn": 0.061632847131208944,
+              "winRate": 1
+            },
+            {
+              "year": 2024,
+              "samples": 7,
+              "averageReturn": 0.005566434994960183,
+              "winRate": 0.5714285714285714
+            },
+            {
+              "year": 2025,
+              "samples": 11,
+              "averageReturn": -0.00361666824741569,
+              "winRate": 0.36363636363636365
+            },
+            {
+              "year": 2026,
+              "samples": 7,
+              "averageReturn": -0.0003796098995427964,
+              "winRate": 0.5714285714285714
+            }
+          ],
+          "validYears": 6,
+          "positiveYears": 3,
+          "positiveYearRate": 0.5,
+          "worstYearReturn": -0.0063729725656888475
+        },
+        "finding": "只作辅助，不单独触发"
+      },
+      {
+        "interval": "1d",
+        "name": "三日止跌放量长下影",
+        "signals": 19,
+        "latestSignal": "2026-02-02",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 19,
+            "winRate": 0.3157894736842105,
+            "averageReturn": -0.01640389551978713,
+            "medianReturn": -0.04333200461610059,
+            "p25Return": -0.060142212585666405
+          },
+          {
+            "days": 14,
+            "samples": 19,
+            "winRate": 0.42105263157894735,
+            "averageReturn": -0.013255097730824872,
+            "medianReturn": -0.018103861594178938,
+            "p25Return": -0.1089594628342896
+          },
+          {
+            "days": 30,
+            "samples": 19,
+            "winRate": 0.3684210526315789,
+            "averageReturn": -0.014839417044145816,
+            "medianReturn": -0.04661775546338431,
+            "p25Return": -0.08008125572889138
+          }
+        ],
+        "score": -0.029349031181591715,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [
+            {
+              "year": 2021,
+              "samples": 3,
+              "averageReturn": -0.023212158289198214,
+              "winRate": 0.3333333333333333
+            },
+            {
+              "year": 2022,
+              "samples": 8,
+              "averageReturn": -0.05771940037548868,
+              "winRate": 0.375
+            },
+            {
+              "year": 2023,
+              "samples": 1,
+              "averageReturn": 0.3529221593272233,
+              "winRate": 1
+            },
+            {
+              "year": 2024,
+              "samples": 3,
+              "averageReturn": -0.01720190222930168,
+              "winRate": 0.3333333333333333
+            },
+            {
+              "year": 2025,
+              "samples": 3,
+              "averageReturn": 0.008413394970855978,
+              "winRate": 0.3333333333333333
+            },
+            {
+              "year": 2026,
+              "samples": 1,
+              "averageReturn": -0.07711388351915276,
+              "winRate": 0
+            }
+          ],
+          "validYears": 4,
+          "positiveYears": 1,
+          "positiveYearRate": 0.25,
+          "worstYearReturn": -0.05771940037548868
+        },
+        "finding": "暂不采用"
+      },
+      {
+        "interval": "1d",
+        "name": "恐慌长下影",
+        "signals": 26,
+        "latestSignal": "2026-03-03",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 26,
+            "winRate": 0.46153846153846156,
+            "averageReturn": -0.017527628110200137,
+            "medianReturn": -0.010917546562154485,
+            "p25Return": -0.060142212585666405
+          },
+          {
+            "days": 14,
+            "samples": 26,
+            "winRate": 0.5,
+            "averageReturn": -0.020496715475395944,
+            "medianReturn": 0.004712079938496316,
+            "p25Return": -0.11869067728249152
+          },
+          {
+            "days": 30,
+            "samples": 26,
+            "winRate": 0.38461538461538464,
+            "averageReturn": -0.03228437284382855,
+            "medianReturn": -0.021013345430068112,
+            "p25Return": -0.13228556401944136
+          }
+        ],
+        "score": -0.030018306641867488,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [
+            {
+              "year": 2021,
+              "samples": 4,
+              "averageReturn": -0.025655083092883037,
+              "winRate": 0.25
+            },
+            {
+              "year": 2022,
+              "samples": 13,
+              "averageReturn": -0.04566727087539882,
+              "winRate": 0.38461538461538464
+            },
+            {
+              "year": 2024,
+              "samples": 3,
+              "averageReturn": 0.06292262466769759,
+              "winRate": 1
+            },
+            {
+              "year": 2025,
+              "samples": 4,
+              "averageReturn": -0.022871446540187156,
+              "winRate": 0.25
+            },
+            {
+              "year": 2026,
+              "samples": 2,
+              "averageReturn": -0.12019046401508467,
+              "winRate": 0
+            }
+          ],
+          "validYears": 5,
+          "positiveYears": 1,
+          "positiveYearRate": 0.2,
+          "worstYearReturn": -0.12019046401508467
+        },
+        "finding": "暂不采用"
+      },
+      {
+        "interval": "1d",
+        "name": "应用综合信号",
+        "signals": 84,
+        "latestSignal": "2026-03-31",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 84,
+            "winRate": 0.44047619047619047,
+            "averageReturn": 0.002189192811166228,
+            "medianReturn": -0.004681414869757747,
+            "p25Return": -0.04519921399230132
+          },
+          {
+            "days": 14,
+            "samples": 84,
+            "winRate": 0.5,
+            "averageReturn": 0.012223515054973263,
+            "medianReturn": 0.005758142018152757,
+            "p25Return": -0.043097853918863144
+          },
+          {
+            "days": 30,
+            "samples": 84,
+            "winRate": 0.5119047619047619,
+            "averageReturn": 0.03111186388060632,
+            "medianReturn": 0.012297308224190943,
+            "p25Return": -0.09586318457713403
+          }
+        ],
+        "score": 0.012941905819441126,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [
+            {
+              "year": 2021,
+              "samples": 19,
+              "averageReturn": 0.10196182701272269,
+              "winRate": 0.5263157894736842
+            },
+            {
+              "year": 2022,
+              "samples": 29,
+              "averageReturn": 0.004663200255296374,
+              "winRate": 0.4482758620689655
+            },
+            {
+              "year": 2023,
+              "samples": 5,
+              "averageReturn": 0.06710408149690669,
+              "winRate": 1
+            },
+            {
+              "year": 2024,
+              "samples": 9,
+              "averageReturn": 0.04504418883878139,
+              "winRate": 0.6666666666666666
+            },
+            {
+              "year": 2025,
+              "samples": 14,
+              "averageReturn": -0.02027666687876195,
+              "winRate": 0.2857142857142857
+            },
+            {
+              "year": 2026,
+              "samples": 8,
+              "averageReturn": 0.010480534324338299,
+              "winRate": 0.625
+            }
+          ],
+          "validYears": 6,
+          "positiveYears": 5,
+          "positiveYearRate": 0.8333333333333334,
+          "worstYearReturn": -0.02027666687876195
+        },
+        "finding": "只作辅助，不单独触发"
+      },
+      {
+        "interval": "1w",
+        "name": "20日新低放量收回",
+        "signals": 0,
+        "latestSignal": "-",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 0,
+            "winRate": 0,
+            "averageReturn": 0,
+            "medianReturn": 0,
+            "p25Return": 0
+          },
+          {
+            "days": 14,
+            "samples": 0,
+            "winRate": 0,
+            "averageReturn": 0,
+            "medianReturn": 0,
+            "p25Return": 0
+          },
+          {
+            "days": 30,
+            "samples": 0,
+            "winRate": 0,
+            "averageReturn": 0,
+            "medianReturn": 0,
+            "p25Return": 0
+          }
+        ],
+        "score": null,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [],
+          "validYears": 0,
+          "positiveYears": 0,
+          "positiveYearRate": 0,
+          "worstYearReturn": 0
+        },
+        "finding": "样本不足，只能观察"
+      },
+      {
+        "interval": "1w",
+        "name": "布林下轨放量收回",
+        "signals": 0,
+        "latestSignal": "-",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 0,
+            "winRate": 0,
+            "averageReturn": 0,
+            "medianReturn": 0,
+            "p25Return": 0
+          },
+          {
+            "days": 14,
+            "samples": 0,
+            "winRate": 0,
+            "averageReturn": 0,
+            "medianReturn": 0,
+            "p25Return": 0
+          },
+          {
+            "days": 30,
+            "samples": 0,
+            "winRate": 0,
+            "averageReturn": 0,
+            "medianReturn": 0,
+            "p25Return": 0
+          }
+        ],
+        "score": null,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [],
+          "validYears": 0,
+          "positiveYears": 0,
+          "positiveYearRate": 0,
+          "worstYearReturn": 0
+        },
+        "finding": "样本不足，只能观察"
+      },
+      {
+        "interval": "1w",
+        "name": "RSI超卖反转",
+        "signals": 2,
+        "latestSignal": "2022-08-29",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 2,
+            "winRate": 0.5,
+            "averageReturn": 0.04412228062526446,
+            "medianReturn": 0.09132713009304859,
+            "p25Return": -0.0030825688425196686
+          },
+          {
+            "days": 14,
+            "samples": 2,
+            "winRate": 0.5,
+            "averageReturn": 0.026552700631382334,
+            "medianReturn": 0.08231096317933587,
+            "p25Return": -0.029205561916571202
+          },
+          {
+            "days": 30,
+            "samples": 2,
+            "winRate": 0.5,
+            "averageReturn": 0.03182144157268753,
+            "medianReturn": 0.11081717553098928,
+            "p25Return": -0.04717429238561422
+          }
+        ],
+        "score": null,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [
+            {
+              "year": 2022,
+              "samples": 2,
+              "averageReturn": 0.03182144157268753,
+              "winRate": 0.5
+            }
+          ],
+          "validYears": 1,
+          "positiveYears": 1,
+          "positiveYearRate": 1,
+          "worstYearReturn": 0.03182144157268753
+        },
+        "finding": "样本不足，只能观察"
+      },
+      {
+        "interval": "1w",
+        "name": "RSI+布林反转",
+        "signals": 2,
+        "latestSignal": "2022-11-21",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 2,
+            "winRate": 1,
+            "averageReturn": 0.07998524401787283,
+            "medianReturn": 0.11876718505159212,
+            "p25Return": 0.041203302984153534
+          },
+          {
+            "days": 14,
+            "samples": 2,
+            "winRate": 1,
+            "averageReturn": 0.07503794060876581,
+            "medianReturn": 0.11012951879743711,
+            "p25Return": 0.03994636242009452
+          },
+          {
+            "days": 30,
+            "samples": 2,
+            "winRate": 0.5,
+            "averageReturn": 0.009863786230819582,
+            "medianReturn": 0.024550210058202848,
+            "p25Return": -0.004822637596563684
+          }
+        ],
+        "score": null,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [
+            {
+              "year": 2022,
+              "samples": 2,
+              "averageReturn": 0.009863786230819582,
+              "winRate": 0.5
+            }
+          ],
+          "validYears": 1,
+          "positiveYears": 1,
+          "positiveYearRate": 1,
+          "worstYearReturn": 0.009863786230819582
+        },
+        "finding": "样本不足，只能观察"
+      },
+      {
+        "interval": "1w",
+        "name": "短跌过度反转",
+        "signals": 11,
+        "latestSignal": "2023-09-11",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 11,
+            "winRate": 0.36363636363636365,
+            "averageReturn": 0.010686395535349827,
+            "medianReturn": -0.005105755641531576,
+            "p25Return": -0.010522284224942235
+          },
+          {
+            "days": 14,
+            "samples": 11,
+            "winRate": 0.5454545454545454,
+            "averageReturn": 0.0022043861466491,
+            "medianReturn": 0.043442497677445804,
+            "p25Return": -0.07587088863765944
+          },
+          {
+            "days": 30,
+            "samples": 11,
+            "winRate": 0.36363636363636365,
+            "averageReturn": -0.04754829736029491,
+            "medianReturn": -0.03838848764641454,
+            "p25Return": -0.10939956118307383
+          }
+        ],
+        "score": -0.016265055946578427,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [
+            {
+              "year": 2021,
+              "samples": 1,
+              "averageReturn": -0.2861802022983923,
+              "winRate": 0
+            },
+            {
+              "year": 2022,
+              "samples": 6,
+              "averageReturn": -0.09973239019741674,
+              "winRate": 0
+            },
+            {
+              "year": 2023,
+              "samples": 4,
+              "averageReturn": 0.09038581812991217,
+              "winRate": 1
+            }
+          ],
+          "validYears": 2,
+          "positiveYears": 1,
+          "positiveYearRate": 0.5,
+          "worstYearReturn": -0.09973239019741674
+        },
+        "finding": "只作辅助，不单独触发"
+      },
+      {
+        "interval": "1w",
+        "name": "三日止跌放量长下影",
+        "signals": 0,
+        "latestSignal": "-",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 0,
+            "winRate": 0,
+            "averageReturn": 0,
+            "medianReturn": 0,
+            "p25Return": 0
+          },
+          {
+            "days": 14,
+            "samples": 0,
+            "winRate": 0,
+            "averageReturn": 0,
+            "medianReturn": 0,
+            "p25Return": 0
+          },
+          {
+            "days": 30,
+            "samples": 0,
+            "winRate": 0,
+            "averageReturn": 0,
+            "medianReturn": 0,
+            "p25Return": 0
+          }
+        ],
+        "score": null,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [],
+          "validYears": 0,
+          "positiveYears": 0,
+          "positiveYearRate": 0,
+          "worstYearReturn": 0
+        },
+        "finding": "样本不足，只能观察"
+      },
+      {
+        "interval": "1w",
+        "name": "恐慌长下影",
+        "signals": 5,
+        "latestSignal": "2023-03-06",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 5,
+            "winRate": 0.4,
+            "averageReturn": -0.0010076552566784414,
+            "medianReturn": -0.0330350037936231,
+            "p25Return": -0.11044597782458038
+          },
+          {
+            "days": 14,
+            "samples": 5,
+            "winRate": 0.4,
+            "averageReturn": -0.005514166900863526,
+            "medianReturn": -0.05939533765798919,
+            "p25Return": -0.13833820424091947
+          },
+          {
+            "days": 30,
+            "samples": 5,
+            "winRate": 0.4,
+            "averageReturn": 0.0026634854087849826,
+            "medianReturn": -0.10939956118307383,
+            "p25Return": -0.1517564139680659
+          }
+        ],
+        "score": null,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [
+            {
+              "year": 2022,
+              "samples": 4,
+              "averageReturn": -0.06857383870424122,
+              "winRate": 0.25
+            },
+            {
+              "year": 2023,
+              "samples": 1,
+              "averageReturn": 0.2876127818608898,
+              "winRate": 1
+            }
+          ],
+          "validYears": 1,
+          "positiveYears": 0,
+          "positiveYearRate": 0,
+          "worstYearReturn": -0.06857383870424122
+        },
+        "finding": "样本不足，只能观察"
+      },
+      {
+        "interval": "1w",
+        "name": "应用综合信号",
+        "signals": 11,
+        "latestSignal": "2023-09-11",
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 11,
+            "winRate": 0.45454545454545453,
+            "averageReturn": 0.029213331418680818,
+            "medianReturn": -0.0012071999392016376,
+            "p25Return": -0.007720700400911994
+          },
+          {
+            "days": 14,
+            "samples": 11,
+            "winRate": 0.5454545454545454,
+            "averageReturn": 0.01565903231267077,
+            "medianReturn": 0.05522795015438695,
+            "p25Return": -0.029205561916571202
+          },
+          {
+            "days": 30,
+            "samples": 11,
+            "winRate": 0.45454545454545453,
+            "averageReturn": -0.01722964404788704,
+            "medianReturn": -0.02858403923838257,
+            "p25Return": -0.04717429238561422
+          }
+        ],
+        "score": 0.004134289625161137,
+        "stability": {
+          "horizonDays": 30,
+          "yearly": [
+            {
+              "year": 2021,
+              "samples": 1,
+              "averageReturn": -0.2861802022983923,
+              "winRate": 0
+            },
+            {
+              "year": 2022,
+              "samples": 6,
+              "averageReturn": -0.0441481924580023,
+              "winRate": 0.16666666666666666
+            },
+            {
+              "year": 2023,
+              "samples": 4,
+              "averageReturn": 0.09038581812991217,
+              "winRate": 1
+            }
+          ],
+          "validYears": 2,
+          "positiveYears": 1,
+          "positiveYearRate": 0.5,
+          "worstYearReturn": -0.0441481924580023
+        },
+        "finding": "只作辅助，不单独触发"
+      }
+    ]
+  },
+  "strategy": {
+    "samples": 56,
+    "rows": [
+      {
+        "name": "周定投",
+        "key": "weeklyDca",
+        "averageEntry": 45916.58294642857,
+        "medianEntry": 37919.01299999999,
+        "averageEfficiency": 0.5537668892858646,
+        "p25Efficiency": 0.4890405141843976,
+        "completionRate": 1
+      },
+      {
+        "name": "30定投+信号",
+        "key": "signalReserve",
+        "averageEntry": 46329.60298082525,
+        "medianEntry": 38308.43383495149,
+        "averageEfficiency": 0.5298421376868621,
+        "p25Efficiency": 0.4330363367089625,
+        "completionRate": 1
+      },
+      {
+        "name": "30定投+阶梯",
+        "key": "relativeLadder",
+        "averageEntry": 46117.26713753249,
+        "medianEntry": 37574.0431654546,
+        "averageEfficiency": 0.5323727555734765,
+        "p25Efficiency": 0.42469260863962277,
+        "completionRate": 1
+      },
+      {
+        "name": "30定投+阶梯+预备",
+        "key": "blendedLadderReserve",
+        "averageEntry": 46147.813038175475,
+        "medianEntry": 37730.283922330134,
+        "averageEfficiency": 0.5329069290598117,
+        "p25Efficiency": 0.435681068671692,
+        "completionRate": 1
+      }
+    ]
+  },
+  "regimes": [
+    {
+      "regime": "deepBear",
+      "rows": [
+        {
+          "name": "周定投",
+          "samples": 26,
+          "averageEntry": 28143.720999999998,
+          "averageEfficiency": 0.5584826561556496,
+          "p25Efficiency": 0.474543507163084,
+          "completionRate": 1
+        },
+        {
+          "name": "30定投+信号",
+          "samples": 26,
+          "averageEntry": 27788.59060494773,
+          "averageEfficiency": 0.5541818722393683,
+          "p25Efficiency": 0.47074774310383416,
+          "completionRate": 1
+        },
+        {
+          "name": "30定投+阶梯",
+          "samples": 26,
+          "averageEntry": 27775.530018195826,
+          "averageEfficiency": 0.5609845399102567,
+          "p25Efficiency": 0.4417397795767438,
+          "completionRate": 1
+        },
+        {
+          "name": "30定投+阶梯+预备",
+          "samples": 26,
+          "averageEntry": 27828.997139492185,
+          "averageEfficiency": 0.5576156912224923,
+          "p25Efficiency": 0.4392941493956829,
+          "completionRate": 1
+        }
+      ]
+    },
+    {
+      "regime": "ordinaryPullback",
+      "rows": [
+        {
+          "name": "周定投",
+          "samples": 34,
+          "averageEntry": 55388.736573529386,
+          "averageEfficiency": 0.529652826808498,
+          "p25Efficiency": 0.4684800659531617,
+          "completionRate": 1
+        },
+        {
+          "name": "30定投+信号",
+          "samples": 34,
+          "averageEntry": 55854.58226727586,
+          "averageEfficiency": 0.5096969915704876,
+          "p25Efficiency": 0.43590659127094344,
+          "completionRate": 1
+        },
+        {
+          "name": "30定投+阶梯",
+          "samples": 34,
+          "averageEntry": 54673.12746144388,
+          "averageEfficiency": 0.5325071928490891,
+          "p25Efficiency": 0.397504211691326,
+          "completionRate": 1
+        },
+        {
+          "name": "30定投+阶梯+预备",
+          "samples": 34,
+          "averageEntry": 55159.91793859854,
+          "averageEfficiency": 0.5218176972434638,
+          "p25Efficiency": 0.397043700239573,
+          "completionRate": 1
+        }
+      ]
+    },
+    {
+      "regime": "bearPullback",
+      "rows": [
+        {
+          "name": "周定投",
+          "samples": 13,
+          "averageEntry": 72078.47288461537,
+          "averageEfficiency": 0.4678707156895958,
+          "p25Efficiency": 0.4210088075158529,
+          "completionRate": 1
+        },
+        {
+          "name": "30定投+信号",
+          "samples": 13,
+          "averageEntry": 72909.32976194922,
+          "averageEfficiency": 0.44221373505291156,
+          "p25Efficiency": 0.3790276217828126,
+          "completionRate": 1
+        },
+        {
+          "name": "30定投+阶梯",
+          "samples": 13,
+          "averageEntry": 73194.49861134269,
+          "averageEfficiency": 0.4224206705021162,
+          "p25Efficiency": 0.3104137502779308,
+          "completionRate": 1
+        },
+        {
+          "name": "30定投+阶梯+预备",
+          "samples": 13,
+          "averageEntry": 73159.01052108592,
+          "averageEfficiency": 0.4246172670458712,
+          "p25Efficiency": 0.3523296104023465,
+          "completionRate": 1
+        }
+      ]
+    }
+  ],
+  "parameterSensitivity": [
+    {
+      "signal": "1D RSI超卖反转",
+      "tested": "RSI 阈值 28/30/32/34/36",
+      "rows": [
+        {
+          "signal": "1D RSI超卖反转",
+          "rsiThreshold": 28,
+          "signals": 20,
+          "score": 0.011830263930227335,
+          "horizonStats": [
+            {
+              "days": 7,
+              "samples": 20,
+              "winRate": 0.6,
+              "averageReturn": 0.018824936810362694,
+              "p25Return": -0.049267839623516684
+            },
+            {
+              "days": 14,
+              "samples": 20,
+              "winRate": 0.45,
+              "averageReturn": 0.009854628709448301,
+              "p25Return": -0.04392802679812093
+            },
+            {
+              "days": 30,
+              "samples": 20,
+              "winRate": 0.55,
+              "averageReturn": 0.04831406615664363,
+              "p25Return": -0.029247415135521964
+            }
+          ]
+        },
+        {
+          "signal": "1D RSI超卖反转",
+          "rsiThreshold": 30,
+          "signals": 21,
+          "score": 0.014420706822081812,
+          "horizonStats": [
+            {
+              "days": 7,
+              "samples": 21,
+              "winRate": 0.6190476190476191,
+              "averageReturn": 0.021720775277404344,
+              "p25Return": -0.049267839623516684
+            },
+            {
+              "days": 14,
+              "samples": 21,
+              "winRate": 0.47619047619047616,
+              "averageReturn": 0.010866910360904716,
+              "p25Return": -0.04392802679812093
+            },
+            {
+              "days": 30,
+              "samples": 21,
+              "winRate": 0.5714285714285714,
+              "averageReturn": 0.045434234744763505,
+              "p25Return": -0.029247415135521964
+            }
+          ]
+        },
+        {
+          "signal": "1D RSI超卖反转",
+          "rsiThreshold": 32,
+          "signals": 26,
+          "score": 0.031069352454223535,
+          "horizonStats": [
+            {
+              "days": 7,
+              "samples": 26,
+              "winRate": 0.6153846153846154,
+              "averageReturn": 0.023963048377597922,
+              "p25Return": -0.049267839623516684
+            },
+            {
+              "days": 14,
+              "samples": 26,
+              "winRate": 0.5384615384615384,
+              "averageReturn": 0.02225370006199529,
+              "p25Return": -0.04392802679812093
+            },
+            {
+              "days": 30,
+              "samples": 26,
+              "winRate": 0.5384615384615384,
+              "averageReturn": 0.057011557013687764,
+              "p25Return": -0.03129223811248068
+            }
+          ]
+        },
+        {
+          "signal": "1D RSI超卖反转",
+          "rsiThreshold": 34,
+          "signals": 29,
+          "score": 0.013291935717845049,
+          "horizonStats": [
+            {
+              "days": 7,
+              "samples": 29,
+              "winRate": 0.5862068965517241,
+              "averageReturn": 0.010405065578290051,
+              "p25Return": -0.05162105885126825
+            },
+            {
+              "days": 14,
+              "samples": 29,
+              "winRate": 0.5172413793103449,
+              "averageReturn": 0.0056317427327737795,
+              "p25Return": -0.05693946134201462
+            },
+            {
+              "days": 30,
+              "samples": 29,
+              "winRate": 0.4827586206896552,
+              "averageReturn": 0.03783955108061896,
+              "p25Return": -0.07711388351915276
+            }
+          ]
+        },
+        {
+          "signal": "1D RSI超卖反转",
+          "rsiThreshold": 36,
+          "signals": 35,
+          "score": 0.024045965545441063,
+          "horizonStats": [
+            {
+              "days": 7,
+              "samples": 35,
+              "winRate": 0.5714285714285714,
+              "averageReturn": 0.017744810014572794,
+              "p25Return": -0.037764550858303395
+            },
+            {
+              "days": 14,
+              "samples": 35,
+              "winRate": 0.5428571428571428,
+              "averageReturn": 0.021367781902799587,
+              "p25Return": -0.04392802679812093
+            },
+            {
+              "days": 30,
+              "samples": 35,
+              "winRate": 0.45714285714285713,
+              "averageReturn": 0.03657671054335368,
+              "p25Return": -0.040100929678286074
+            }
+          ]
+        }
+      ],
+      "best": {
+        "signal": "1D RSI超卖反转",
+        "rsiThreshold": 32,
+        "signals": 26,
+        "score": 0.031069352454223535,
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 26,
+            "winRate": 0.6153846153846154,
+            "averageReturn": 0.023963048377597922,
+            "p25Return": -0.049267839623516684
+          },
+          {
+            "days": 14,
+            "samples": 26,
+            "winRate": 0.5384615384615384,
+            "averageReturn": 0.02225370006199529,
+            "p25Return": -0.04392802679812093
+          },
+          {
+            "days": 30,
+            "samples": 26,
+            "winRate": 0.5384615384615384,
+            "averageReturn": 0.057011557013687764,
+            "p25Return": -0.03129223811248068
+          }
+        ]
+      },
+      "baseline": {
+        "signal": "1D RSI超卖反转",
+        "rsiThreshold": 32,
+        "signals": 26,
+        "score": 0.031069352454223535,
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 26,
+            "winRate": 0.6153846153846154,
+            "averageReturn": 0.023963048377597922,
+            "p25Return": -0.049267839623516684
+          },
+          {
+            "days": 14,
+            "samples": 26,
+            "winRate": 0.5384615384615384,
+            "averageReturn": 0.02225370006199529,
+            "p25Return": -0.04392802679812093
+          },
+          {
+            "days": 30,
+            "samples": 26,
+            "winRate": 0.5384615384615384,
+            "averageReturn": 0.057011557013687764,
+            "p25Return": -0.03129223811248068
+          }
+        ]
+      }
+    },
+    {
+      "signal": "4H 短跌过度反转",
+      "tested": "7根K回撤 6/8/10/12%，收回位置 55/58/62%",
+      "rows": [
+        {
+          "signal": "4H 短跌过度反转",
+          "drawdownThreshold": -0.06,
+          "recoveryThreshold": 0.55,
+          "signals": 183,
+          "score": 0.021819932668242857,
+          "horizonStats": [
+            {
+              "days": 7,
+              "samples": 183,
+              "winRate": 0.5683060109289617,
+              "averageReturn": 0.010301237146598889,
+              "p25Return": -0.03368723779359065
+            },
+            {
+              "days": 14,
+              "samples": 183,
+              "winRate": 0.5355191256830601,
+              "averageReturn": 0.02200531156213045,
+              "p25Return": -0.05010118238880968
+            },
+            {
+              "days": 30,
+              "samples": 183,
+              "winRate": 0.4918032786885246,
+              "averageReturn": 0.033323834212633456,
+              "p25Return": -0.08651091239653914
+            }
+          ]
+        },
+        {
+          "signal": "4H 短跌过度反转",
+          "drawdownThreshold": -0.06,
+          "recoveryThreshold": 0.58,
+          "signals": 181,
+          "score": 0.023571548219677677,
+          "horizonStats": [
+            {
+              "days": 7,
+              "samples": 181,
+              "winRate": 0.569060773480663,
+              "averageReturn": 0.010881464599319123,
+              "p25Return": -0.03288389140145174
+            },
+            {
+              "days": 14,
+              "samples": 181,
+              "winRate": 0.5414364640883977,
+              "averageReturn": 0.022932826063448722,
+              "p25Return": -0.05010118238880968
+            },
+            {
+              "days": 30,
+              "samples": 181,
+              "winRate": 0.4972375690607735,
+              "averageReturn": 0.03510712969035085,
+              "p25Return": -0.08651091239653914
+            }
+          ]
+        },
+        {
+          "signal": "4H 短跌过度反转",
+          "drawdownThreshold": -0.06,
+          "recoveryThreshold": 0.62,
+          "signals": 176,
+          "score": 0.02526784129968076,
+          "horizonStats": [
+            {
+              "days": 7,
+              "samples": 176,
+              "winRate": 0.5568181818181818,
+              "averageReturn": 0.010844308752176915,
+              "p25Return": -0.03368723779359065
+            },
+            {
+              "days": 14,
+              "samples": 176,
+              "winRate": 0.5454545454545454,
+              "averageReturn": 0.024890188398294363,
+              "p25Return": -0.048315189452399925
+            },
+            {
+              "days": 30,
+              "samples": 176,
+              "winRate": 0.4943181818181818,
+              "averageReturn": 0.035651217777413834,
+              "p25Return": -0.08651091239653914
+            }
+          ]
+        },
+        {
+          "signal": "4H 短跌过度反转",
+          "drawdownThreshold": -0.08,
+          "recoveryThreshold": 0.55,
+          "signals": 81,
+          "score": 0.03151041872099474,
+          "horizonStats": [
+            {
+              "days": 7,
+              "samples": 81,
+              "winRate": 0.6049382716049383,
+              "averageReturn": 0.008827577440272705,
+              "p25Return": -0.04264253123522741
+            },
+            {
+              "days": 14,
+              "samples": 81,
+              "winRate": 0.5432098765432098,
+              "averageReturn": 0.022067987247649683,
+              "p25Return": -0.048315189452399925
+            },
+            {
+              "days": 30,
+              "samples": 81,
+              "winRate": 0.5061728395061729,
+              "averageReturn": 0.05788529837302628,
+              "p25Return": -0.07331040211279605
+            }
+          ]
+        },
+        {
+          "signal": "4H 短跌过度反转",
+          "drawdownThreshold": -0.08,
+          "recoveryThreshold": 0.58,
+          "signals": 80,
+          "score": 0.030815856506207613,
+          "horizonStats": [
+            {
+              "days": 7,
+              "samples": 80,
+              "winRate": 0.6,
+              "averageReturn": 0.008681711525495002,
+              "p25Return": -0.03551986464749587
+            },
+            {
+              "days": 14,
+              "samples": 80,
+              "winRate": 0.5375,
+              "averageReturn": 0.021657723180365497,
+              "p25Return": -0.048315189452399925
+            },
+            {
+              "days": 30,
+              "samples": 80,
+              "winRate": 0.5,
+              "averageReturn": 0.0583859892321004,
+              "p25Return": -0.07331040211279605
+            }
+          ]
+        },
+        {
+          "signal": "4H 短跌过度反转",
+          "drawdownThreshold": -0.08,
+          "recoveryThreshold": 0.62,
+          "signals": 80,
+          "score": 0.02924426261012729,
+          "horizonStats": [
+            {
+              "days": 7,
+              "samples": 80,
+              "winRate": 0.5875,
+              "averageReturn": 0.007743790869554785,
+              "p25Return": -0.038308865946569674
+            },
+            {
+              "days": 14,
+              "samples": 80,
+              "winRate": 0.525,
+              "averageReturn": 0.021253029295373906,
+              "p25Return": -0.048315189452399925
+            },
+            {
+              "days": 30,
+              "samples": 80,
+              "winRate": 0.5,
+              "averageReturn": 0.058701755952574354,
+              "p25Return": -0.07133841549385009
+            }
+          ]
+        },
+        {
+          "signal": "4H 短跌过度反转",
+          "drawdownThreshold": -0.1,
+          "recoveryThreshold": 0.55,
+          "signals": 47,
+          "score": 0.0445248929255244,
+          "horizonStats": [
+            {
+              "days": 7,
+              "samples": 47,
+              "winRate": 0.5531914893617021,
+              "averageReturn": 0.009416455665078635,
+              "p25Return": -0.04433041285050287
+            },
+            {
+              "days": 14,
+              "samples": 47,
+              "winRate": 0.574468085106383,
+              "averageReturn": 0.025551162289979584,
+              "p25Return": -0.037067905211940255
+            },
+            {
+              "days": 30,
+              "samples": 47,
+              "winRate": 0.5106382978723404,
+              "averageReturn": 0.07730323456920811,
+              "p25Return": -0.044342573729578574
+            }
+          ]
+        },
+        {
+          "signal": "4H 短跌过度反转",
+          "drawdownThreshold": -0.1,
+          "recoveryThreshold": 0.58,
+          "signals": 46,
+          "score": 0.042680538757642446,
+          "horizonStats": [
+            {
+              "days": 7,
+              "samples": 46,
+              "winRate": 0.5434782608695652,
+              "averageReturn": 0.009175577513830585,
+              "p25Return": -0.04433041285050287
+            },
+            {
+              "days": 14,
+              "samples": 46,
+              "winRate": 0.5652173913043478,
+              "averageReturn": 0.024913380760840348,
+              "p25Return": -0.048315189452399925
+            },
+            {
+              "days": 30,
+              "samples": 46,
+              "winRate": 0.5,
+              "averageReturn": 0.07859613032838443,
+              "p25Return": -0.05435963662272889
+            }
+          ]
+        },
+        {
+          "signal": "4H 短跌过度反转",
+          "drawdownThreshold": -0.1,
+          "recoveryThreshold": 0.62,
+          "signals": 46,
+          "score": 0.042680538757642446,
+          "horizonStats": [
+            {
+              "days": 7,
+              "samples": 46,
+              "winRate": 0.5434782608695652,
+              "averageReturn": 0.009175577513830585,
+              "p25Return": -0.04433041285050287
+            },
+            {
+              "days": 14,
+              "samples": 46,
+              "winRate": 0.5652173913043478,
+              "averageReturn": 0.024913380760840348,
+              "p25Return": -0.048315189452399925
+            },
+            {
+              "days": 30,
+              "samples": 46,
+              "winRate": 0.5,
+              "averageReturn": 0.07859613032838443,
+              "p25Return": -0.05435963662272889
+            }
+          ]
+        },
+        {
+          "signal": "4H 短跌过度反转",
+          "drawdownThreshold": -0.12,
+          "recoveryThreshold": 0.55,
+          "signals": 25,
+          "score": 0.008640501685218249,
+          "horizonStats": [
+            {
+              "days": 7,
+              "samples": 25,
+              "winRate": 0.6,
+              "averageReturn": 0.008213444613018032,
+              "p25Return": -0.05784378624674762
+            },
+            {
+              "days": 14,
+              "samples": 25,
+              "winRate": 0.52,
+              "averageReturn": -0.00018706018209750235,
+              "p25Return": -0.06676379514861708
+            },
+            {
+              "days": 30,
+              "samples": 25,
+              "winRate": 0.4,
+              "averageReturn": 0.03333080679728997,
+              "p25Return": -0.096581133087941
+            }
+          ]
+        },
+        {
+          "signal": "4H 短跌过度反转",
+          "drawdownThreshold": -0.12,
+          "recoveryThreshold": 0.58,
+          "signals": 25,
+          "score": 0.008640501685218249,
+          "horizonStats": [
+            {
+              "days": 7,
+              "samples": 25,
+              "winRate": 0.6,
+              "averageReturn": 0.008213444613018032,
+              "p25Return": -0.05784378624674762
+            },
+            {
+              "days": 14,
+              "samples": 25,
+              "winRate": 0.52,
+              "averageReturn": -0.00018706018209750235,
+              "p25Return": -0.06676379514861708
+            },
+            {
+              "days": 30,
+              "samples": 25,
+              "winRate": 0.4,
+              "averageReturn": 0.03333080679728997,
+              "p25Return": -0.096581133087941
+            }
+          ]
+        },
+        {
+          "signal": "4H 短跌过度反转",
+          "drawdownThreshold": -0.12,
+          "recoveryThreshold": 0.62,
+          "signals": 25,
+          "score": 0.008640501685218249,
+          "horizonStats": [
+            {
+              "days": 7,
+              "samples": 25,
+              "winRate": 0.6,
+              "averageReturn": 0.008213444613018032,
+              "p25Return": -0.05784378624674762
+            },
+            {
+              "days": 14,
+              "samples": 25,
+              "winRate": 0.52,
+              "averageReturn": -0.00018706018209750235,
+              "p25Return": -0.06676379514861708
+            },
+            {
+              "days": 30,
+              "samples": 25,
+              "winRate": 0.4,
+              "averageReturn": 0.03333080679728997,
+              "p25Return": -0.096581133087941
+            }
+          ]
+        }
+      ],
+      "best": {
+        "signal": "4H 短跌过度反转",
+        "drawdownThreshold": -0.1,
+        "recoveryThreshold": 0.55,
+        "signals": 47,
+        "score": 0.0445248929255244,
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 47,
+            "winRate": 0.5531914893617021,
+            "averageReturn": 0.009416455665078635,
+            "p25Return": -0.04433041285050287
+          },
+          {
+            "days": 14,
+            "samples": 47,
+            "winRate": 0.574468085106383,
+            "averageReturn": 0.025551162289979584,
+            "p25Return": -0.037067905211940255
+          },
+          {
+            "days": 30,
+            "samples": 47,
+            "winRate": 0.5106382978723404,
+            "averageReturn": 0.07730323456920811,
+            "p25Return": -0.044342573729578574
+          }
+        ]
+      },
+      "baseline": {
+        "signal": "4H 短跌过度反转",
+        "drawdownThreshold": -0.08,
+        "recoveryThreshold": 0.58,
+        "signals": 80,
+        "score": 0.030815856506207613,
+        "horizonStats": [
+          {
+            "days": 7,
+            "samples": 80,
+            "winRate": 0.6,
+            "averageReturn": 0.008681711525495002,
+            "p25Return": -0.03551986464749587
+          },
+          {
+            "days": 14,
+            "samples": 80,
+            "winRate": 0.5375,
+            "averageReturn": 0.021657723180365497,
+            "p25Return": -0.048315189452399925
+          },
+          {
+            "days": 30,
+            "samples": 80,
+            "winRate": 0.5,
+            "averageReturn": 0.0583859892321004,
+            "p25Return": -0.07331040211279605
+          }
+        ]
+      }
+    }
+  ],
+  "walkForward": [
+    {
+      "interval": "1d",
+      "name": "RSI超卖反转",
+      "role": "主信号",
+      "splitDate": "2023-01-01",
+      "trainSignals": 12,
+      "train30DayAverage": 0.07643102246138767,
+      "testSignals": 14,
+      "test30DayAverage": 0.040366300915659285,
+      "test30DayWinRate": 0.6428571428571429,
+      "test30DayP25": -0.02507365691141041,
+      "passed": true
+    },
+    {
+      "interval": "1d",
+      "name": "RSI超卖反转",
+      "role": "主信号",
+      "splitDate": "2024-01-01",
+      "trainSignals": 15,
+      "train30DayAverage": 0.0614721851808585,
+      "testSignals": 11,
+      "test30DayAverage": 0.05092888224027314,
+      "test30DayWinRate": 0.6363636363636364,
+      "test30DayP25": -0.024319142169541834,
+      "passed": true
+    },
+    {
+      "interval": "1d",
+      "name": "RSI超卖反转",
+      "role": "主信号",
+      "splitDate": "2025-01-01",
+      "trainSignals": 20,
+      "train30DayAverage": 0.0654880430620796,
+      "testSignals": 6,
+      "test30DayAverage": 0.028756603519048324,
+      "test30DayWinRate": 0.5,
+      "test30DayP25": -0.07711388351915276,
+      "passed": true
+    },
+    {
+      "interval": "4h",
+      "name": "短跌过度反转",
+      "role": "确认信号",
+      "splitDate": "2023-01-01",
+      "trainSignals": 57,
+      "train30DayAverage": 0.0669175477594188,
+      "testSignals": 23,
+      "test30DayAverage": 0.03724256157744175,
+      "test30DayWinRate": 0.6086956521739131,
+      "test30DayP25": -0.010083771806395272,
+      "passed": true
+    },
+    {
+      "interval": "4h",
+      "name": "短跌过度反转",
+      "role": "确认信号",
+      "splitDate": "2024-01-01",
+      "trainSignals": 60,
+      "train30DayAverage": 0.06937059905859956,
+      "testSignals": 20,
+      "test30DayAverage": 0.025432159752602924,
+      "test30DayWinRate": 0.6,
+      "test30DayP25": -0.010083771806395272,
+      "passed": true
+    },
+    {
+      "interval": "4h",
+      "name": "短跌过度反转",
+      "role": "确认信号",
+      "splitDate": "2025-01-01",
+      "trainSignals": 67,
+      "train30DayAverage": 0.07049708776228207,
+      "testSignals": 13,
+      "test30DayAverage": -0.004032749346528251,
+      "test30DayWinRate": 0.46153846153846156,
+      "test30DayP25": -0.08030516506133402,
+      "passed": false
+    }
+  ]
+}
