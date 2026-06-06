@@ -813,6 +813,21 @@ function App() {
     }
   }
 
+  async function signInWithGitHub() {
+    if (!tradeCloudSync) {
+      return;
+    }
+
+    setIsCloudSyncBusy(true);
+    try {
+      setCloudSyncStatus('正在跳转到 GitHub 登录...');
+      await tradeCloudSync.signInWithGitHub(`${window.location.origin}${window.location.pathname}`);
+    } catch (error) {
+      setCloudSyncStatus(`GitHub 登录失败：${error instanceof Error ? error.message : '未知错误'}`);
+      setIsCloudSyncBusy(false);
+    }
+  }
+
   async function signOutFromCloud() {
     if (!tradeCloudSync) {
       return;
@@ -1050,6 +1065,9 @@ function App() {
               </div>
               {tradeCloudSync && !cloudUser && (
                 <div className="cloud-login-form">
+                  <button type="button" className="github-login-button" onClick={signInWithGitHub} disabled={isCloudSyncBusy}>
+                    GitHub 登录
+                  </button>
                   <input
                     type="email"
                     value={cloudEmail}

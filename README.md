@@ -48,7 +48,7 @@ npm run verify:all
 
 ## Supabase 云端同步
 
-交易记录默认保存在浏览器 `localStorage`。配置 Supabase 后，页面会显示邮箱 Magic Link 登录，并把交易记录同步到云端；未登录或网络失败时仍保留本地缓存。
+交易记录默认保存在浏览器 `localStorage`。配置 Supabase 后，页面会显示 GitHub OAuth 登录和邮箱 Magic Link 备用登录，并把交易记录同步到云端；未登录或网络失败时仍保留本地缓存。
 
 接入步骤：
 
@@ -62,7 +62,31 @@ cp .env.example .env.local
 npm run build
 ```
 
-Auth 使用邮箱 Magic Link 登录。`trade_records` 表开启了 Row Level Security，每个登录用户只能访问自己的交易记录。
+Auth 默认使用 GitHub OAuth 登录，邮箱 Magic Link 作为备用。`trade_records` 表开启了 Row Level Security，每个登录用户只能访问自己的交易记录。
+
+GitHub 登录需要额外配置：
+
+1. 在 GitHub 创建 OAuth App。
+2. Authorization callback URL 填 Supabase Auth callback：
+
+```text
+https://jvtnayctpnpifchqhesl.supabase.co/auth/v1/callback
+```
+
+3. 在 Supabase `Authentication > Sign In / Providers > GitHub` 启用 GitHub provider，并填入 GitHub OAuth App 的 Client ID 和 Client Secret。
+4. Supabase `Authentication > URL Configuration` 的 Site URL 保持：
+
+```text
+https://drincann.github.io/btc-dca-monitor/
+```
+
+5. Redirect URLs 至少包含：
+
+```text
+https://drincann.github.io/btc-dca-monitor/
+http://localhost:5173/btc-dca-monitor/
+http://127.0.0.1:5173/btc-dca-monitor/
+```
 
 ## 文件职责
 

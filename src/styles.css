@@ -729,6 +729,17 @@ select:hover {
   font-weight: 750;
 }
 
+.cloud-login-form .github-login-button {
+  border-color: #3a3a3a;
+  color: #fff;
+  background: #111;
+}
+
+.cloud-login-form .github-login-button:hover {
+  border-color: #fff;
+  background: #181818;
+}
+
 .cloud-login-form button:disabled,
 .cloud-session-actions button:disabled {
   cursor: not-allowed;

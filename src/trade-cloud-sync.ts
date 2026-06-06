@@ -108,6 +108,16 @@ export class TradeCloudSync {
     requireNoError(error);
   }
 
+  async signInWithGitHub(redirectTo: string) {
+    const { error } = await this.client.auth.signInWithOAuth({
+      provider: 'github',
+      options: {
+        redirectTo,
+      },
+    });
+    requireNoError(error);
+  }
+
   async signOut() {
     const { error } = await this.client.auth.signOut();
     requireNoError(error);
