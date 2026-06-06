@@ -621,7 +621,7 @@ select:hover {
   grid-column: span 2;
 }
 
-.trade-form button,
+.trade-form-actions button,
 .ghost-button {
   align-self: end;
   border: 1px solid #fff;
@@ -632,8 +632,29 @@ select:hover {
   font-weight: 700;
 }
 
-.trade-form button:hover {
+.trade-form-actions button:hover {
   background: #e8e8e8;
+}
+
+.trade-form-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-self: end;
+  gap: 8px;
+}
+
+.trade-form-actions button:first-child:last-child {
+  grid-column: 1 / -1;
+}
+
+.trade-form-actions .secondary-button {
+  color: #ededed;
+  background: #050505;
+}
+
+.trade-form-actions .secondary-button:hover {
+  color: #fff;
+  background: #121212;
 }
 
 .ghost-button {
@@ -1071,7 +1092,7 @@ select:hover {
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 840px;
+  min-width: 900px;
 }
 
 th,
@@ -1093,6 +1114,10 @@ th {
 td {
   color: #dedede;
   font-size: 13px;
+}
+
+.editing-row td {
+  background: #0c0c0c;
 }
 
 .buy-tag,
@@ -1122,6 +1147,13 @@ td {
 
 .link-button:hover {
   color: #fff;
+}
+
+.table-actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  justify-content: flex-end;
 }
 
 .empty-cell {

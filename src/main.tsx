@@ -93,6 +93,28 @@ const defaultTradeDraft = (): TradeDraft => ({
   note: '',
 });
 
+function tradeDraftFromTrade(trade: Trade): TradeDraft {
+  return {
+    date: trade.date,
+    side: trade.side,
+    btcAmount: trade.btcAmount,
+    priceUsdt: trade.priceUsdt,
+    feeUsdt: trade.feeUsdt,
+    note: trade.note,
+  };
+}
+
+function normalizeTradeDraft(draft: TradeDraft): TradeDraft {
+  return {
+    date: draft.date || new Date().toISOString().slice(0, 10),
+    side: draft.side,
+    btcAmount: Math.max(0, draft.btcAmount),
+    priceUsdt: Math.max(0, draft.priceUsdt),
+    feeUsdt: Math.max(0, draft.feeUsdt),
+    note: draft.note.trim(),
+  };
+}
+
 const currency = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 const btcFormat = new Intl.NumberFormat('en-US', { maximumFractionDigits: 6 });
 const klineCache = new Map<string, { candles: Candle[]; provider: KlineProvider }>();
@@ -483,6 +505,7 @@ function App() {
   const [settings, setSettings] = useState<PlanSettings>(initialState.settings);
   const [trades, setTrades] = useState<Trade[]>(initialState.trades);
   const [draft, setDraft] = useState<TradeDraft>(defaultTradeDraft);
+  const [editingTradeId, setEditingTradeId] = useState<string | null>(null);
   const [interval, setInterval] = useState<KlineInterval>('1d');
   const [showChart, setShowChart] = useState(true);
   const [showResearch, setShowResearch] = useState(false);
@@ -531,6 +554,7 @@ function App() {
   );
 
   const latestPrice = candles.length > 0 ? candles[candles.length - 1].close : draft.priceUsdt;
+  const isEditingTrade = editingTradeId !== null;
 
   useEffect(() => {
     window.localStorage.setItem(storageKey, JSON.stringify({ settings, trades }));
@@ -624,27 +648,56 @@ function App() {
 
   function submitTrade(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (draft.btcAmount <= 0 || draft.priceUsdt <= 0) {
+    const normalizedDraft = normalizeTradeDraft(draft);
+    if (normalizedDraft.btcAmount <= 0 || normalizedDraft.priceUsdt <= 0) {
       return;
     }
 
-    setTrades((current) => [
-      {
-        ...draft,
-        id: crypto.randomUUID(),
-        feeUsdt: Math.max(0, draft.feeUsdt),
-      },
-      ...current,
-    ]);
+    if (editingTradeId) {
+      setTrades((current) =>
+        current.map((trade) =>
+          trade.id === editingTradeId
+            ? {
+                ...normalizedDraft,
+                id: trade.id,
+              }
+            : trade,
+        ),
+      );
+      setEditingTradeId(null);
+    } else {
+      setTrades((current) => [
+        {
+          ...normalizedDraft,
+          id: crypto.randomUUID(),
+        },
+        ...current,
+      ]);
+    }
+
+    setDraft({ ...defaultTradeDraft(), priceUsdt: Math.round(latestPrice) });
+  }
+
+  function startEditingTrade(trade: Trade) {
+    setEditingTradeId(trade.id);
+    setDraft(tradeDraftFromTrade(trade));
+  }
+
+  function cancelEditingTrade() {
+    setEditingTradeId(null);
     setDraft({ ...defaultTradeDraft(), priceUsdt: Math.round(latestPrice) });
   }
 
   function deleteTrade(id: string) {
     setTrades((current) => current.filter((trade) => trade.id !== id));
+    if (editingTradeId === id) {
+      cancelEditingTrade();
+    }
   }
 
   function resetDemoData() {
     setTrades([]);
+    cancelEditingTrade();
   }
 
   function toggleChartLayer(layer: keyof ChartLayers) {
@@ -748,7 +801,7 @@ function App() {
 
       <section className="layout lower-layout">
         <div className="panel">
-          <h2>录入交易</h2>
+          <h2>{isEditingTrade ? '修改交易' : '录入交易'}</h2>
           <form className="trade-form" onSubmit={submitTrade}>
             <label>
               日期
@@ -777,7 +830,10 @@ function App() {
               备注
               <input value={draft.note} placeholder="例如：主信号买入 / DCA / 清扫补仓" onChange={(event) => setDraft({ ...draft, note: event.target.value })} />
             </label>
-            <button type="submit">保存交易</button>
+            <div className="trade-form-actions">
+              <button type="submit">{isEditingTrade ? '保存修改' : '保存交易'}</button>
+              {isEditingTrade && <button type="button" className="secondary-button" onClick={cancelEditingTrade}>取消</button>}
+            </div>
           </form>
         </div>
 
@@ -834,14 +890,19 @@ function App() {
                 </tr>
               ) : (
                 trades.map((trade) => (
-                  <tr key={trade.id}>
+                  <tr key={trade.id} className={trade.id === editingTradeId ? 'editing-row' : undefined}>
                     <td>{trade.date}</td>
                     <td><span className={trade.side === 'buy' ? 'buy-tag' : 'sell-tag'}>{trade.side === 'buy' ? '买入' : '卖出'}</span></td>
                     <td>{btcFormat.format(trade.btcAmount)} BTC</td>
                     <td>{currency.format(trade.priceUsdt)} USDT</td>
                     <td>{currency.format(trade.btcAmount * trade.priceUsdt + trade.feeUsdt)} USDT</td>
                     <td>{trade.note || '-'}</td>
-                    <td><button className="link-button" onClick={() => deleteTrade(trade.id)}>删除</button></td>
+                    <td>
+                      <div className="table-actions">
+                        <button className="link-button" onClick={() => startEditingTrade(trade)}>编辑</button>
+                        <button className="link-button" onClick={() => deleteTrade(trade.id)}>删除</button>
+                      </div>
+                    </td>
                   </tr>
                 ))
               )}
