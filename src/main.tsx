@@ -923,20 +923,8 @@ function App() {
 
   return (
     <main className="app-shell">
-      <section className="hero panel">
-        <div>
-          <p className="eyebrow">BTC/USDT</p>
-          <h1>建仓计划</h1>
-          <p className="hero-copy">仓位 / 预算 / 执行</p>
-        </div>
-        <div className="target-card">
-          <span>预算均衡价</span>
-          <strong>{currency.format(metrics.planTargetAverageUsdt)} USDT</strong>
-          <small>可用 USDT / 初始 BTC 缺口</small>
-        </div>
-      </section>
-
       <section className="grid metrics-grid">
+        <Metric label="现价" value={`${currency.format(latestPrice)} USDT`} hint="BTC/USDT" />
         <Metric label="持仓" value={`${btcFormat.format(metrics.currentBtc)} BTC`} hint={`差 ${btcFormat.format(metrics.remainingBtcToTarget)} BTC`} />
         <Metric label="已买均价" value={metrics.currentBuyAverage ? `${currency.format(metrics.currentBuyAverage)} USDT` : '暂无'} hint={`预算均衡价 ${currency.format(metrics.planTargetAverageUsdt)} USDT`} />
         <Metric label="剩余可用仓位" value={`${currency.format(metrics.remainingBudgetUsdt)} USDT`} hint={`已支出 ${currency.format(metrics.spentUsdt)} USDT`} />
