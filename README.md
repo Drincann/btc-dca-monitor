@@ -46,6 +46,24 @@ npm run verify:all
 
 `verify:all` 会重新生成报告、校验 policy、构建前端，并用本地行情夹具做运行态截图和像素校验。`backtest:signals`、`backtest:strategy`、`backtest:regimes` 用于重新研究指标和策略，不放进默认验收链路。
 
+## Supabase 云端同步
+
+交易记录默认保存在浏览器 `localStorage`。配置 Supabase 后，页面会显示邮箱验证码登录，并把交易记录同步到云端；未登录或网络失败时仍保留本地缓存。
+
+接入步骤：
+
+1. 创建 Supabase 项目，区域建议选 Singapore 或 Tokyo。
+2. 在 Supabase SQL Editor 执行 `supabase/schema.sql`。
+3. 复制 `.env.example` 为 `.env.local`，填入项目的 URL 和 anon key。
+4. 本地运行或重新部署页面。
+
+```bash
+cp .env.example .env.local
+npm run build
+```
+
+Auth 使用邮箱 OTP 验证码登录。`trade_records` 表开启了 Row Level Security，每个登录用户只能访问自己的交易记录。
+
 ## 文件职责
 
 - `shared/market-signals.mjs`：相对抄底信号、候选指标、信号回测。
@@ -55,6 +73,7 @@ npm run verify:all
 - `scripts/generate-backtest-report.mjs`：生成 `reports/backtest-report.md` 和 `reports/backtest-report.json`，包含信号排名、样本外验证、参数敏感性和策略回测。
 - `scripts/verify-backtest-policy.mjs`：验证报告、前端 policy、主信号、样本外表现和固定价格残留。
 - `scripts/verify-runtime-page.mjs`：启动临时页面，用本地行情夹具截图并检查 K 线和抄底标记像素。
+- `src/trade-cloud-sync.ts`：Supabase Auth 和交易记录云端同步封装。
 - `src/main.tsx`：监控台 UI、交易记录、本轮执行决策。
 
 ## 关键约束

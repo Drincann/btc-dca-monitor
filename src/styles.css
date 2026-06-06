@@ -671,6 +671,77 @@ select:hover {
   background: #121212;
 }
 
+.cloud-sync-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  border: 1px solid #202020;
+  border-radius: 7px;
+  padding: 10px;
+  background: #080808;
+}
+
+.cloud-sync-panel > div:first-child {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.cloud-sync-panel span,
+.cloud-sync-panel small {
+  color: #858585;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cloud-sync-panel strong {
+  overflow: hidden;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cloud-login-form,
+.cloud-session-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cloud-login-form input {
+  width: 150px;
+  padding: 8px 9px;
+  font-size: 12px;
+}
+
+.cloud-login-form button {
+  min-width: 92px;
+  border: 1px solid #fff;
+  border-radius: 7px;
+  padding: 8px 10px;
+  color: #000;
+  background: #fff;
+  font-size: 12px;
+  font-weight: 750;
+}
+
+.cloud-login-form button:disabled,
+.cloud-session-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.cloud-session-actions small {
+  max-width: 260px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .ghost-button {
   color: #ededed;
   background: #050505;
@@ -1251,6 +1322,18 @@ td {
   .layer-tabs,
   .interval-tabs,
   .chart-floating-controls {
+    width: 100%;
+  }
+
+  .cloud-sync-panel,
+  .cloud-login-form,
+  .cloud-session-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .cloud-login-form input,
+  .cloud-login-form button {
     width: 100%;
   }
 

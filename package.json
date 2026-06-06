@@ -18,6 +18,7 @@
     "verify:all": "npm run backtest:report && npm run verify:policy && npm run build && npm run verify:runtime"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.107.0",
     "@vitejs/plugin-react": "latest",
     "react": "latest",
     "react-dom": "latest",

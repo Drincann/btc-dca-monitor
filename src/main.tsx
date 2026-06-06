@@ -9,6 +9,8 @@ import {
   collectBottomSignals,
 } from '../shared/market-signals.mjs';
 import type { BottomSignal, SignalBacktest } from '../shared/market-signals.mjs';
+import { createTradeCloudSync } from './trade-cloud-sync';
+import type { TradeCloudUser } from './trade-cloud-sync';
 import './styles.css';
 
 type Candle = {
@@ -513,14 +515,23 @@ function useBtcCandles(interval: KlineInterval) {
 
 function App() {
   const initialState = useMemo(readInitialState, []);
+  const tradeCloudSync = useMemo(createTradeCloudSync, []);
   const [settings, setSettings] = useState<PlanSettings>(initialState.settings);
   const [trades, setTrades] = useState<Trade[]>(initialState.trades);
   const [draft, setDraft] = useState<TradeDraft>(defaultTradeDraft);
   const [editingTradeId, setEditingTradeId] = useState<string | null>(null);
   const [editingDraft, setEditingDraft] = useState<TradeDraft | null>(null);
+  const [cloudUser, setCloudUser] = useState<TradeCloudUser | null>(null);
+  const [cloudEmail, setCloudEmail] = useState('');
+  const [cloudLoginCode, setCloudLoginCode] = useState('');
+  const [hasSentCloudLoginCode, setHasSentCloudLoginCode] = useState(false);
+  const [cloudSyncStatus, setCloudSyncStatus] = useState('云端同步未配置，当前保存到本地浏览器');
+  const [isCloudSyncBusy, setIsCloudSyncBusy] = useState(false);
   const [interval, setInterval] = useState<KlineInterval>('1d');
   const [showChart, setShowChart] = useState(true);
   const [showResearch, setShowResearch] = useState(false);
+  const tradesRef = useRef(trades);
+  const cloudUserRef = useRef<TradeCloudUser | null>(null);
   const [chartLayers, setChartLayers] = useState<ChartLayers>({
     averages: true,
     bollinger: false,
@@ -570,6 +581,61 @@ function App() {
   useEffect(() => {
     window.localStorage.setItem(storageKey, JSON.stringify({ settings, trades }));
   }, [settings, trades]);
+
+  useEffect(() => {
+    tradesRef.current = trades;
+  }, [trades]);
+
+  useEffect(() => {
+    cloudUserRef.current = cloudUser;
+  }, [cloudUser]);
+
+  useEffect(() => {
+    if (!tradeCloudSync) {
+      setCloudSyncStatus('云端同步未配置，当前保存到本地浏览器');
+      return;
+    }
+
+    let isActive = true;
+
+    tradeCloudSync
+      .currentUser()
+      .then((user) => {
+        if (!isActive) {
+          return;
+        }
+
+        setCloudUser(user);
+        if (user) {
+          syncTradesFromCloud(user);
+        } else {
+          setCloudSyncStatus('未登录，当前保存到本地浏览器');
+        }
+      })
+      .catch((error) => {
+        if (isActive) {
+          setCloudSyncStatus(`云端会话读取失败：${error instanceof Error ? error.message : '未知错误'}`);
+        }
+      });
+
+    const unsubscribe = tradeCloudSync.onUserChange((user) => {
+      if (!isActive) {
+        return;
+      }
+
+      setCloudUser(user);
+      if (user) {
+        syncTradesFromCloud(user);
+      } else {
+        setCloudSyncStatus('未登录，当前保存到本地浏览器');
+      }
+    });
+
+    return () => {
+      isActive = false;
+      unsubscribe();
+    };
+  }, [tradeCloudSync]);
 
   const metrics = useMemo(() => {
     const buyTrades = trades.filter((trade) => trade.side === 'buy');
@@ -657,21 +723,150 @@ function App() {
     setSettings((current) => ({ ...current, [key]: value }));
   }
 
-  function submitTrade(event: FormEvent<HTMLFormElement>) {
+  async function syncTradesFromCloud(user: TradeCloudUser) {
+    if (!tradeCloudSync) {
+      return;
+    }
+
+    setIsCloudSyncBusy(true);
+    setCloudSyncStatus('正在同步云端交易记录...');
+
+    try {
+      const cloudTrades = await tradeCloudSync.listTrades();
+      const localTrades = tradesRef.current;
+
+      if (cloudTrades.length === 0 && localTrades.length > 0) {
+        await tradeCloudSync.saveTrades(localTrades, user);
+        setCloudSyncStatus(`已登录 ${user.email}，已把本地 ${localTrades.length} 条记录上传到云端`);
+        return;
+      }
+
+      setTrades(cloudTrades);
+      setCloudSyncStatus(`已登录 ${user.email}，云端 ${cloudTrades.length} 条记录已同步`);
+    } catch (error) {
+      setCloudSyncStatus(`云端同步失败，本地缓存仍可用：${error instanceof Error ? error.message : '未知错误'}`);
+    } finally {
+      setIsCloudSyncBusy(false);
+    }
+  }
+
+  async function saveTradeToCloud(trade: Trade) {
+    const user = cloudUserRef.current;
+    if (!tradeCloudSync || !user) {
+      return;
+    }
+
+    setIsCloudSyncBusy(true);
+    try {
+      await tradeCloudSync.saveTrade(trade, user);
+      setCloudSyncStatus(`已同步到云端：${new Date().toLocaleTimeString()}`);
+    } catch (error) {
+      setCloudSyncStatus(`云端保存失败，本地缓存已保存：${error instanceof Error ? error.message : '未知错误'}`);
+    } finally {
+      setIsCloudSyncBusy(false);
+    }
+  }
+
+  async function deleteTradeFromCloud(id: string) {
+    if (!tradeCloudSync || !cloudUserRef.current) {
+      return;
+    }
+
+    setIsCloudSyncBusy(true);
+    try {
+      await tradeCloudSync.deleteTrade(id);
+      setCloudSyncStatus(`云端已删除：${new Date().toLocaleTimeString()}`);
+    } catch (error) {
+      setCloudSyncStatus(`云端删除失败，本地缓存已删除：${error instanceof Error ? error.message : '未知错误'}`);
+    } finally {
+      setIsCloudSyncBusy(false);
+    }
+  }
+
+  async function deleteTradesFromCloud(ids: string[]) {
+    if (!tradeCloudSync || !cloudUserRef.current || ids.length === 0) {
+      return;
+    }
+
+    setIsCloudSyncBusy(true);
+    try {
+      await tradeCloudSync.deleteTrades(ids);
+      setCloudSyncStatus(`云端记录已清空：${new Date().toLocaleTimeString()}`);
+    } catch (error) {
+      setCloudSyncStatus(`云端清空失败，本地缓存已清空：${error instanceof Error ? error.message : '未知错误'}`);
+    } finally {
+      setIsCloudSyncBusy(false);
+    }
+  }
+
+  async function sendCloudLoginCode() {
+    if (!tradeCloudSync || !cloudEmail.trim()) {
+      return;
+    }
+
+    setIsCloudSyncBusy(true);
+    try {
+      await tradeCloudSync.sendLoginCode(cloudEmail.trim());
+      setHasSentCloudLoginCode(true);
+      setCloudSyncStatus(`验证码已发送到 ${cloudEmail.trim()}`);
+    } catch (error) {
+      setCloudSyncStatus(`验证码发送失败：${error instanceof Error ? error.message : '未知错误'}`);
+    } finally {
+      setIsCloudSyncBusy(false);
+    }
+  }
+
+  async function verifyCloudLoginCode() {
+    if (!tradeCloudSync || !cloudEmail.trim() || !cloudLoginCode.trim()) {
+      return;
+    }
+
+    setIsCloudSyncBusy(true);
+    try {
+      const user = await tradeCloudSync.verifyLoginCode(cloudEmail.trim(), cloudLoginCode.trim());
+      setCloudUser(user);
+      setCloudLoginCode('');
+      setHasSentCloudLoginCode(false);
+      await syncTradesFromCloud(user);
+    } catch (error) {
+      setCloudSyncStatus(`登录失败：${error instanceof Error ? error.message : '未知错误'}`);
+    } finally {
+      setIsCloudSyncBusy(false);
+    }
+  }
+
+  async function signOutFromCloud() {
+    if (!tradeCloudSync) {
+      return;
+    }
+
+    setIsCloudSyncBusy(true);
+    try {
+      await tradeCloudSync.signOut();
+      setCloudUser(null);
+      setCloudSyncStatus('已退出云端同步，当前保存到本地浏览器');
+    } catch (error) {
+      setCloudSyncStatus(`退出失败：${error instanceof Error ? error.message : '未知错误'}`);
+    } finally {
+      setIsCloudSyncBusy(false);
+    }
+  }
+
+  async function submitTrade(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const normalizedDraft = normalizeTradeDraft(draft);
     if (normalizedDraft.btcAmount <= 0 || normalizedDraft.priceUsdt <= 0) {
       return;
     }
 
-    setTrades((current) => [
-      {
-        ...normalizedDraft,
-        id: crypto.randomUUID(),
-      },
-      ...current,
-    ]);
+    const trade = {
+      ...normalizedDraft,
+      id: crypto.randomUUID(),
+    };
+
+    setTrades((current) => [trade, ...current]);
     setDraft({ ...defaultTradeDraft(), priceUsdt: Math.round(latestPrice) });
+    await saveTradeToCloud(trade);
   }
 
   function startEditingTrade(trade: Trade) {
@@ -688,7 +883,7 @@ function App() {
     setEditingDraft((current) => (current ? { ...current, [key]: value } : current));
   }
 
-  function saveEditingTrade(id: string) {
+  async function saveEditingTrade(id: string) {
     if (!editingDraft) {
       return;
     }
@@ -698,29 +893,35 @@ function App() {
       return;
     }
 
+    const updatedTrade = {
+      ...normalizedDraft,
+      id,
+    };
+
     setTrades((current) =>
       current.map((trade) =>
         trade.id === id
-          ? {
-              ...normalizedDraft,
-              id: trade.id,
-            }
+          ? updatedTrade
           : trade,
       ),
     );
     cancelEditingTrade();
+    await saveTradeToCloud(updatedTrade);
   }
 
-  function deleteTrade(id: string) {
+  async function deleteTrade(id: string) {
     setTrades((current) => current.filter((trade) => trade.id !== id));
     if (editingTradeId === id) {
       cancelEditingTrade();
     }
+    await deleteTradeFromCloud(id);
   }
 
-  function resetDemoData() {
+  async function resetDemoData() {
+    const ids = trades.map((trade) => trade.id);
     setTrades([]);
     cancelEditingTrade();
+    await deleteTradesFromCloud(ids);
   }
 
   function toggleChartLayer(layer: keyof ChartLayers) {
@@ -860,9 +1061,43 @@ function App() {
             <div className="section-title">
               <div>
                 <h2>交易记录</h2>
-                <p>数据保存在当前浏览器本地，不会上传。</p>
+                <p>{cloudUser ? '数据会同步到 Supabase，同时保留本地缓存。' : '未登录时数据保存在当前浏览器本地。'}</p>
               </div>
               <button className="ghost-button" onClick={resetDemoData}>清空记录</button>
+            </div>
+            <div className="cloud-sync-panel">
+              <div>
+                <span>{tradeCloudSync ? 'Supabase 云端同步' : 'Supabase 未配置'}</span>
+                <strong>{cloudUser ? cloudUser.email : cloudSyncStatus}</strong>
+              </div>
+              {tradeCloudSync && !cloudUser && (
+                <div className="cloud-login-form">
+                  <input
+                    type="email"
+                    value={cloudEmail}
+                    placeholder="邮箱"
+                    onChange={(event) => setCloudEmail(event.target.value)}
+                  />
+                  {hasSentCloudLoginCode && (
+                    <input
+                      inputMode="numeric"
+                      value={cloudLoginCode}
+                      placeholder="验证码"
+                      onChange={(event) => setCloudLoginCode(event.target.value)}
+                    />
+                  )}
+                  <button type="button" onClick={hasSentCloudLoginCode ? verifyCloudLoginCode : sendCloudLoginCode} disabled={isCloudSyncBusy}>
+                    {hasSentCloudLoginCode ? '登录' : '发送验证码'}
+                  </button>
+                </div>
+              )}
+              {tradeCloudSync && cloudUser && (
+                <div className="cloud-session-actions">
+                  <small>{cloudSyncStatus}</small>
+                  <button type="button" className="link-button" onClick={() => syncTradesFromCloud(cloudUser)} disabled={isCloudSyncBusy}>刷新</button>
+                  <button type="button" className="link-button" onClick={signOutFromCloud} disabled={isCloudSyncBusy}>退出</button>
+                </div>
+              )}
             </div>
             <div className="table-wrap">
               <table className="records-table">
