@@ -159,11 +159,14 @@ h2 {
 
 .lower-layout {
   grid-template-columns: minmax(0, 1fr) 460px;
+  align-items: start;
 }
 
 .chart-panel,
 .settings-panel,
 .advice-panel,
+.trade-entry-panel,
+.records-panel,
 .lower-layout > .panel,
 .app-shell > .panel:last-child {
   padding: 18px;
@@ -615,6 +618,16 @@ select:hover {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 12px;
+}
+
+.trade-workspace {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+}
+
+.trade-entry-panel {
+  align-self: start;
 }
 
 .wide-field {
@@ -1095,6 +1108,35 @@ table {
   min-width: 900px;
 }
 
+.records-table {
+  table-layout: fixed;
+}
+
+.records-date-col {
+  width: 132px;
+}
+
+.records-side-col {
+  width: 82px;
+}
+
+.records-btc-col {
+  width: 128px;
+}
+
+.records-price-col,
+.records-total-col {
+  width: 126px;
+}
+
+.records-fee-col {
+  width: 104px;
+}
+
+.records-action-col {
+  width: 92px;
+}
+
 th,
 td {
   border-bottom: 1px solid #1a1a1a;
@@ -1118,6 +1160,18 @@ td {
 
 .editing-row td {
   background: #0c0c0c;
+}
+
+.table-input {
+  min-width: 0;
+  width: 100%;
+  border-radius: 6px;
+  padding: 8px 9px;
+  font-size: 12px;
+}
+
+.table-note-input {
+  min-width: 0;
 }
 
 .buy-tag,
@@ -1146,6 +1200,10 @@ td {
 }
 
 .link-button:hover {
+  color: #fff;
+}
+
+.primary-link-button {
   color: #fff;
 }
 

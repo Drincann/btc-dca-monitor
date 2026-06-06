@@ -506,6 +506,7 @@ function App() {
   const [trades, setTrades] = useState<Trade[]>(initialState.trades);
   const [draft, setDraft] = useState<TradeDraft>(defaultTradeDraft);
   const [editingTradeId, setEditingTradeId] = useState<string | null>(null);
+  const [editingDraft, setEditingDraft] = useState<TradeDraft | null>(null);
   const [interval, setInterval] = useState<KlineInterval>('1d');
   const [showChart, setShowChart] = useState(true);
   const [showResearch, setShowResearch] = useState(false);
@@ -554,7 +555,6 @@ function App() {
   );
 
   const latestPrice = candles.length > 0 ? candles[candles.length - 1].close : draft.priceUsdt;
-  const isEditingTrade = editingTradeId !== null;
 
   useEffect(() => {
     window.localStorage.setItem(storageKey, JSON.stringify({ settings, trades }));
@@ -653,39 +653,51 @@ function App() {
       return;
     }
 
-    if (editingTradeId) {
-      setTrades((current) =>
-        current.map((trade) =>
-          trade.id === editingTradeId
-            ? {
-                ...normalizedDraft,
-                id: trade.id,
-              }
-            : trade,
-        ),
-      );
-      setEditingTradeId(null);
-    } else {
-      setTrades((current) => [
-        {
-          ...normalizedDraft,
-          id: crypto.randomUUID(),
-        },
-        ...current,
-      ]);
-    }
-
+    setTrades((current) => [
+      {
+        ...normalizedDraft,
+        id: crypto.randomUUID(),
+      },
+      ...current,
+    ]);
     setDraft({ ...defaultTradeDraft(), priceUsdt: Math.round(latestPrice) });
   }
 
   function startEditingTrade(trade: Trade) {
     setEditingTradeId(trade.id);
-    setDraft(tradeDraftFromTrade(trade));
+    setEditingDraft(tradeDraftFromTrade(trade));
   }
 
   function cancelEditingTrade() {
     setEditingTradeId(null);
-    setDraft({ ...defaultTradeDraft(), priceUsdt: Math.round(latestPrice) });
+    setEditingDraft(null);
+  }
+
+  function updateEditingTradeDraft<K extends keyof TradeDraft>(key: K, value: TradeDraft[K]) {
+    setEditingDraft((current) => (current ? { ...current, [key]: value } : current));
+  }
+
+  function saveEditingTrade(id: string) {
+    if (!editingDraft) {
+      return;
+    }
+
+    const normalizedDraft = normalizeTradeDraft(editingDraft);
+    if (normalizedDraft.btcAmount <= 0 || normalizedDraft.priceUsdt <= 0) {
+      return;
+    }
+
+    setTrades((current) =>
+      current.map((trade) =>
+        trade.id === id
+          ? {
+              ...normalizedDraft,
+              id: trade.id,
+            }
+          : trade,
+      ),
+    );
+    cancelEditingTrade();
   }
 
   function deleteTrade(id: string) {
@@ -800,41 +812,133 @@ function App() {
       </section>
 
       <section className="layout lower-layout">
-        <div className="panel">
-          <h2>{isEditingTrade ? '修改交易' : '录入交易'}</h2>
-          <form className="trade-form" onSubmit={submitTrade}>
-            <label>
-              日期
-              <input type="date" value={draft.date} onChange={(event) => setDraft({ ...draft, date: event.target.value })} />
-            </label>
-            <label>
-              方向
-              <select value={draft.side} onChange={(event) => setDraft({ ...draft, side: event.target.value as Trade['side'] })}>
-                <option value="buy">买入</option>
-                <option value="sell">卖出</option>
-              </select>
-            </label>
-            <label>
-              BTC 数量
-              <input type="number" min="0" step="0.000001" value={draft.btcAmount} onChange={(event) => setDraft({ ...draft, btcAmount: Number(event.target.value) })} />
-            </label>
-            <label>
-              成交价 USDT
-              <input type="number" min="0" step="1" value={draft.priceUsdt} onChange={(event) => setDraft({ ...draft, priceUsdt: Number(event.target.value) })} />
-            </label>
-            <label>
-              手续费 USDT
-              <input type="number" min="0" step="0.01" value={draft.feeUsdt} onChange={(event) => setDraft({ ...draft, feeUsdt: Number(event.target.value) })} />
-            </label>
-            <label className="wide-field">
-              备注
-              <input value={draft.note} placeholder="例如：主信号买入 / DCA / 清扫补仓" onChange={(event) => setDraft({ ...draft, note: event.target.value })} />
-            </label>
-            <div className="trade-form-actions">
-              <button type="submit">{isEditingTrade ? '保存修改' : '保存交易'}</button>
-              {isEditingTrade && <button type="button" className="secondary-button" onClick={cancelEditingTrade}>取消</button>}
+        <div className="trade-workspace">
+          <div className="panel trade-entry-panel">
+            <h2>录入交易</h2>
+            <form className="trade-form" onSubmit={submitTrade}>
+              <label>
+                日期
+                <input type="date" value={draft.date} onChange={(event) => setDraft({ ...draft, date: event.target.value })} />
+              </label>
+              <label>
+                方向
+                <select value={draft.side} onChange={(event) => setDraft({ ...draft, side: event.target.value as Trade['side'] })}>
+                  <option value="buy">买入</option>
+                  <option value="sell">卖出</option>
+                </select>
+              </label>
+              <label>
+                BTC 数量
+                <input type="number" min="0" step="0.000001" value={draft.btcAmount} onChange={(event) => setDraft({ ...draft, btcAmount: Number(event.target.value) })} />
+              </label>
+              <label>
+                成交价 USDT
+                <input type="number" min="0" step="1" value={draft.priceUsdt} onChange={(event) => setDraft({ ...draft, priceUsdt: Number(event.target.value) })} />
+              </label>
+              <label>
+                手续费 USDT
+                <input type="number" min="0" step="0.01" value={draft.feeUsdt} onChange={(event) => setDraft({ ...draft, feeUsdt: Number(event.target.value) })} />
+              </label>
+              <label className="wide-field">
+                备注
+                <input value={draft.note} placeholder="例如：主信号买入 / DCA / 清扫补仓" onChange={(event) => setDraft({ ...draft, note: event.target.value })} />
+              </label>
+              <div className="trade-form-actions">
+                <button type="submit">保存交易</button>
+              </div>
+            </form>
+          </div>
+
+          <section className="panel records-panel">
+            <div className="section-title">
+              <div>
+                <h2>交易记录</h2>
+                <p>数据保存在当前浏览器本地，不会上传。</p>
+              </div>
+              <button className="ghost-button" onClick={resetDemoData}>清空记录</button>
             </div>
-          </form>
+            <div className="table-wrap">
+              <table className="records-table">
+                <colgroup>
+                  <col className="records-date-col" />
+                  <col className="records-side-col" />
+                  <col className="records-btc-col" />
+                  <col className="records-price-col" />
+                  <col className="records-fee-col" />
+                  <col className="records-total-col" />
+                  <col className="records-note-col" />
+                  <col className="records-action-col" />
+                </colgroup>
+                <thead>
+                  <tr>
+                    <th>日期</th>
+                    <th>方向</th>
+                    <th>数量</th>
+                    <th>成交价</th>
+                    <th>手续费</th>
+                    <th>金额</th>
+                    <th>备注</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {trades.length === 0 ? (
+                    <tr>
+                      <td colSpan={8} className="empty-cell">还没有交易记录。先录入下一笔买入，图上会自动出现标记。</td>
+                    </tr>
+                  ) : (
+                    trades.map((trade) => {
+                      const rowDraft = trade.id === editingTradeId ? editingDraft : null;
+                      const rowDraftTotalUsdt = rowDraft ? rowDraft.btcAmount * rowDraft.priceUsdt + rowDraft.feeUsdt : 0;
+
+                      return (
+                        <tr key={trade.id} className={rowDraft ? 'editing-row' : undefined}>
+                          {rowDraft ? (
+                            <>
+                              <td><input className="table-input" type="date" value={rowDraft.date} onChange={(event) => updateEditingTradeDraft('date', event.target.value)} /></td>
+                              <td>
+                                <select className="table-input" value={rowDraft.side} onChange={(event) => updateEditingTradeDraft('side', event.target.value as Trade['side'])}>
+                                  <option value="buy">买入</option>
+                                  <option value="sell">卖出</option>
+                                </select>
+                              </td>
+                              <td><input className="table-input" type="number" min="0" step="0.000001" value={rowDraft.btcAmount} onChange={(event) => updateEditingTradeDraft('btcAmount', Number(event.target.value))} /></td>
+                              <td><input className="table-input" type="number" min="0" step="1" value={rowDraft.priceUsdt} onChange={(event) => updateEditingTradeDraft('priceUsdt', Number(event.target.value))} /></td>
+                              <td><input className="table-input" type="number" min="0" step="0.01" value={rowDraft.feeUsdt} onChange={(event) => updateEditingTradeDraft('feeUsdt', Number(event.target.value))} /></td>
+                              <td>{currency.format(rowDraftTotalUsdt)} USDT</td>
+                              <td><input className="table-input table-note-input" value={rowDraft.note} onChange={(event) => updateEditingTradeDraft('note', event.target.value)} /></td>
+                              <td>
+                                <div className="table-actions">
+                                  <button className="link-button primary-link-button" onClick={() => saveEditingTrade(trade.id)}>保存</button>
+                                  <button className="link-button" onClick={cancelEditingTrade}>取消</button>
+                                </div>
+                              </td>
+                            </>
+                          ) : (
+                            <>
+                              <td>{trade.date}</td>
+                              <td><span className={trade.side === 'buy' ? 'buy-tag' : 'sell-tag'}>{trade.side === 'buy' ? '买入' : '卖出'}</span></td>
+                              <td>{btcFormat.format(trade.btcAmount)} BTC</td>
+                              <td>{currency.format(trade.priceUsdt)} USDT</td>
+                              <td>{currency.format(trade.feeUsdt)} USDT</td>
+                              <td>{currency.format(trade.btcAmount * trade.priceUsdt + trade.feeUsdt)} USDT</td>
+                              <td>{trade.note || '-'}</td>
+                              <td>
+                                <div className="table-actions">
+                                  <button className="link-button" onClick={() => startEditingTrade(trade)}>编辑</button>
+                                  <button className="link-button" onClick={() => deleteTrade(trade.id)}>删除</button>
+                                </div>
+                              </td>
+                            </>
+                          )}
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
         </div>
 
         <div className="panel advice-panel">
@@ -859,55 +963,6 @@ function App() {
               <StrategyBacktestCard backtest={strategyBacktest} />
             </div>
           )}
-        </div>
-      </section>
-
-      <section className="panel">
-        <div className="section-title">
-          <div>
-            <h2>交易记录</h2>
-            <p>数据保存在当前浏览器本地，不会上传。</p>
-          </div>
-          <button className="ghost-button" onClick={resetDemoData}>清空记录</button>
-        </div>
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>日期</th>
-                <th>方向</th>
-                <th>数量</th>
-                <th>成交价</th>
-                <th>金额</th>
-                <th>备注</th>
-                <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {trades.length === 0 ? (
-                <tr>
-                  <td colSpan={7} className="empty-cell">还没有交易记录。先录入下一笔买入，图上会自动出现标记。</td>
-                </tr>
-              ) : (
-                trades.map((trade) => (
-                  <tr key={trade.id} className={trade.id === editingTradeId ? 'editing-row' : undefined}>
-                    <td>{trade.date}</td>
-                    <td><span className={trade.side === 'buy' ? 'buy-tag' : 'sell-tag'}>{trade.side === 'buy' ? '买入' : '卖出'}</span></td>
-                    <td>{btcFormat.format(trade.btcAmount)} BTC</td>
-                    <td>{currency.format(trade.priceUsdt)} USDT</td>
-                    <td>{currency.format(trade.btcAmount * trade.priceUsdt + trade.feeUsdt)} USDT</td>
-                    <td>{trade.note || '-'}</td>
-                    <td>
-                      <div className="table-actions">
-                        <button className="link-button" onClick={() => startEditingTrade(trade)}>编辑</button>
-                        <button className="link-button" onClick={() => deleteTrade(trade.id)}>删除</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))
-              )}
-            </tbody>
-          </table>
         </div>
       </section>
     </main>
