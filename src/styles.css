@@ -687,6 +687,7 @@ select:hover {
   display: grid;
   gap: 4px;
   min-width: 0;
+  flex: 1;
 }
 
 .cloud-sync-panel span,
@@ -705,11 +706,19 @@ select:hover {
   white-space: nowrap;
 }
 
+.cloud-sync-panel > div:first-child small {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  line-height: 1.45;
+  white-space: normal;
+}
+
 .cloud-login-form,
 .cloud-session-actions {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-shrink: 0;
 }
 
 .cloud-login-form input {
@@ -746,11 +755,20 @@ select:hover {
   opacity: 0.55;
 }
 
-.cloud-session-actions small {
-  max-width: 260px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.cloud-session-actions .link-button {
+  border: 1px solid #2d2d2d;
+  border-radius: 999px;
+  padding: 5px 9px;
+  color: #cfcfcf;
+  background: #0b0b0b;
+  font-size: 12px;
+  line-height: 1;
+}
+
+.cloud-session-actions .link-button:hover {
+  border-color: #fff;
+  color: #fff;
+  background: #121212;
 }
 
 .ghost-button {

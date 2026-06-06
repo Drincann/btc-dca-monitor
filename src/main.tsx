@@ -1062,6 +1062,7 @@ function App() {
               <div>
                 <span>{tradeCloudSync ? 'Supabase 云端同步' : 'Supabase 未配置'}</span>
                 <strong>{cloudUser ? cloudUser.email : cloudSyncStatus}</strong>
+                {cloudUser && <small>{cloudSyncStatus}</small>}
               </div>
               {tradeCloudSync && !cloudUser && (
                 <div className="cloud-login-form">
@@ -1081,7 +1082,6 @@ function App() {
               )}
               {tradeCloudSync && cloudUser && (
                 <div className="cloud-session-actions">
-                  <small>{cloudSyncStatus}</small>
                   <button type="button" className="link-button" onClick={() => syncTradesFromCloud(cloudUser)} disabled={isCloudSyncBusy}>刷新</button>
                   <button type="button" className="link-button" onClick={signOutFromCloud} disabled={isCloudSyncBusy}>退出</button>
                 </div>
