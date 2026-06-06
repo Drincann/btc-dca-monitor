@@ -26,7 +26,6 @@ type Trade = {
   side: 'buy' | 'sell';
   btcAmount: number;
   priceUsdt: number;
-  feeUsdt: number;
   note: string;
 };
 
@@ -89,7 +88,6 @@ const defaultTradeDraft = (): TradeDraft => ({
   side: 'buy',
   btcAmount: 0.01,
   priceUsdt: 58000,
-  feeUsdt: 0,
   note: '',
 });
 
@@ -99,7 +97,6 @@ function tradeDraftFromTrade(trade: Trade): TradeDraft {
     side: trade.side,
     btcAmount: trade.btcAmount,
     priceUsdt: trade.priceUsdt,
-    feeUsdt: trade.feeUsdt,
     note: trade.note,
   };
 }
@@ -110,8 +107,22 @@ function normalizeTradeDraft(draft: TradeDraft): TradeDraft {
     side: draft.side,
     btcAmount: Math.max(0, draft.btcAmount),
     priceUsdt: Math.max(0, draft.priceUsdt),
-    feeUsdt: Math.max(0, draft.feeUsdt),
     note: draft.note.trim(),
+  };
+}
+
+function normalizeStoredTrade(trade: Partial<Trade>): Trade | null {
+  if (!trade.id || !trade.date || !trade.side || trade.btcAmount === undefined || trade.priceUsdt === undefined) {
+    return null;
+  }
+
+  return {
+    id: trade.id,
+    date: trade.date,
+    side: trade.side,
+    btcAmount: Number(trade.btcAmount),
+    priceUsdt: Number(trade.priceUsdt),
+    note: trade.note ?? '',
   };
 }
 
@@ -381,7 +392,7 @@ function readInitialState() {
         availableUsdt: parsed.settings?.availableUsdt ?? legacyAvailableUsdt ?? defaultSettings.availableUsdt,
         targetDate: parsed.settings?.targetDate ?? defaultSettings.targetDate,
       },
-      trades: parsed.trades ?? [],
+      trades: (parsed.trades ?? []).map(normalizeStoredTrade).filter((trade): trade is Trade => trade !== null),
     };
   } catch {
     return { settings: defaultSettings, trades: [] as Trade[] };
@@ -393,7 +404,7 @@ function signedTradeBtc(trade: Trade) {
 }
 
 function signedTradeCostUsdt(trade: Trade) {
-  const gross = trade.btcAmount * trade.priceUsdt + trade.feeUsdt;
+  const gross = trade.btcAmount * trade.priceUsdt;
   return trade.side === 'buy' ? gross : -gross;
 }
 
@@ -565,7 +576,7 @@ function App() {
     const netTradeBtc = trades.reduce((sum, trade) => sum + signedTradeBtc(trade), 0);
     const totalBuyBtc = buyTrades.reduce((sum, trade) => sum + trade.btcAmount, 0);
     const netTradeCostUsdt = trades.reduce((sum, trade) => sum + signedTradeCostUsdt(trade), 0);
-    const buyCostUsdt = buyTrades.reduce((sum, trade) => sum + trade.btcAmount * trade.priceUsdt + trade.feeUsdt, 0);
+    const buyCostUsdt = buyTrades.reduce((sum, trade) => sum + trade.btcAmount * trade.priceUsdt, 0);
     const spentUsdt = Math.max(0, netTradeCostUsdt);
     const remainingBudgetUsdt = Math.max(0, settings.availableUsdt - spentUsdt);
     const currentBtc = settings.existingBtc + netTradeBtc;
@@ -835,10 +846,6 @@ function App() {
                 成交价 USDT
                 <input type="number" min="0" step="1" value={draft.priceUsdt} onChange={(event) => setDraft({ ...draft, priceUsdt: Number(event.target.value) })} />
               </label>
-              <label>
-                手续费 USDT
-                <input type="number" min="0" step="0.01" value={draft.feeUsdt} onChange={(event) => setDraft({ ...draft, feeUsdt: Number(event.target.value) })} />
-              </label>
               <label className="wide-field">
                 备注
                 <input value={draft.note} placeholder="例如：主信号买入 / DCA / 清扫补仓" onChange={(event) => setDraft({ ...draft, note: event.target.value })} />
@@ -864,7 +871,6 @@ function App() {
                   <col className="records-side-col" />
                   <col className="records-btc-col" />
                   <col className="records-price-col" />
-                  <col className="records-fee-col" />
                   <col className="records-total-col" />
                   <col className="records-note-col" />
                   <col className="records-action-col" />
@@ -875,7 +881,6 @@ function App() {
                     <th>方向</th>
                     <th>数量</th>
                     <th>成交价</th>
-                    <th>手续费</th>
                     <th>金额</th>
                     <th>备注</th>
                     <th></th>
@@ -884,12 +889,12 @@ function App() {
                 <tbody>
                   {trades.length === 0 ? (
                     <tr>
-                      <td colSpan={8} className="empty-cell">还没有交易记录。先录入下一笔买入，图上会自动出现标记。</td>
+                      <td colSpan={7} className="empty-cell">还没有交易记录。先录入下一笔买入，图上会自动出现标记。</td>
                     </tr>
                   ) : (
                     trades.map((trade) => {
                       const rowDraft = trade.id === editingTradeId ? editingDraft : null;
-                      const rowDraftTotalUsdt = rowDraft ? rowDraft.btcAmount * rowDraft.priceUsdt + rowDraft.feeUsdt : 0;
+                      const rowDraftTotalUsdt = rowDraft ? rowDraft.btcAmount * rowDraft.priceUsdt : 0;
 
                       return (
                         <tr key={trade.id} className={rowDraft ? 'editing-row' : undefined}>
@@ -904,7 +909,6 @@ function App() {
                               </td>
                               <td><input className="table-input" type="number" min="0" step="0.000001" value={rowDraft.btcAmount} onChange={(event) => updateEditingTradeDraft('btcAmount', Number(event.target.value))} /></td>
                               <td><input className="table-input" type="number" min="0" step="1" value={rowDraft.priceUsdt} onChange={(event) => updateEditingTradeDraft('priceUsdt', Number(event.target.value))} /></td>
-                              <td><input className="table-input" type="number" min="0" step="0.01" value={rowDraft.feeUsdt} onChange={(event) => updateEditingTradeDraft('feeUsdt', Number(event.target.value))} /></td>
                               <td>{currency.format(rowDraftTotalUsdt)} USDT</td>
                               <td><input className="table-input table-note-input" value={rowDraft.note} onChange={(event) => updateEditingTradeDraft('note', event.target.value)} /></td>
                               <td>
@@ -920,8 +924,7 @@ function App() {
                               <td><span className={trade.side === 'buy' ? 'buy-tag' : 'sell-tag'}>{trade.side === 'buy' ? '买入' : '卖出'}</span></td>
                               <td>{btcFormat.format(trade.btcAmount)} BTC</td>
                               <td>{currency.format(trade.priceUsdt)} USDT</td>
-                              <td>{currency.format(trade.feeUsdt)} USDT</td>
-                              <td>{currency.format(trade.btcAmount * trade.priceUsdt + trade.feeUsdt)} USDT</td>
+                              <td>{currency.format(trade.btcAmount * trade.priceUsdt)} USDT</td>
                               <td>{trade.note || '-'}</td>
                               <td>
                                 <div className="table-actions">
