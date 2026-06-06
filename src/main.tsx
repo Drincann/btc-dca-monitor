@@ -523,8 +523,6 @@ function App() {
   const [editingDraft, setEditingDraft] = useState<TradeDraft | null>(null);
   const [cloudUser, setCloudUser] = useState<TradeCloudUser | null>(null);
   const [cloudEmail, setCloudEmail] = useState('');
-  const [cloudLoginCode, setCloudLoginCode] = useState('');
-  const [hasSentCloudLoginCode, setHasSentCloudLoginCode] = useState(false);
   const [cloudSyncStatus, setCloudSyncStatus] = useState('云端同步未配置，当前保存到本地浏览器');
   const [isCloudSyncBusy, setIsCloudSyncBusy] = useState(false);
   const [interval, setInterval] = useState<KlineInterval>('1d');
@@ -799,37 +797,17 @@ function App() {
     }
   }
 
-  async function sendCloudLoginCode() {
+  async function sendCloudLoginLink() {
     if (!tradeCloudSync || !cloudEmail.trim()) {
       return;
     }
 
     setIsCloudSyncBusy(true);
     try {
-      await tradeCloudSync.sendLoginCode(cloudEmail.trim());
-      setHasSentCloudLoginCode(true);
-      setCloudSyncStatus(`验证码已发送到 ${cloudEmail.trim()}`);
+      await tradeCloudSync.sendLoginLink(cloudEmail.trim(), `${window.location.origin}${window.location.pathname}`);
+      setCloudSyncStatus(`登录链接已发送到 ${cloudEmail.trim()}，请打开邮件完成登录`);
     } catch (error) {
-      setCloudSyncStatus(`验证码发送失败：${error instanceof Error ? error.message : '未知错误'}`);
-    } finally {
-      setIsCloudSyncBusy(false);
-    }
-  }
-
-  async function verifyCloudLoginCode() {
-    if (!tradeCloudSync || !cloudEmail.trim() || !cloudLoginCode.trim()) {
-      return;
-    }
-
-    setIsCloudSyncBusy(true);
-    try {
-      const user = await tradeCloudSync.verifyLoginCode(cloudEmail.trim(), cloudLoginCode.trim());
-      setCloudUser(user);
-      setCloudLoginCode('');
-      setHasSentCloudLoginCode(false);
-      await syncTradesFromCloud(user);
-    } catch (error) {
-      setCloudSyncStatus(`登录失败：${error instanceof Error ? error.message : '未知错误'}`);
+      setCloudSyncStatus(`登录链接发送失败：${error instanceof Error ? error.message : '未知错误'}`);
     } finally {
       setIsCloudSyncBusy(false);
     }
@@ -1078,16 +1056,8 @@ function App() {
                     placeholder="邮箱"
                     onChange={(event) => setCloudEmail(event.target.value)}
                   />
-                  {hasSentCloudLoginCode && (
-                    <input
-                      inputMode="numeric"
-                      value={cloudLoginCode}
-                      placeholder="验证码"
-                      onChange={(event) => setCloudLoginCode(event.target.value)}
-                    />
-                  )}
-                  <button type="button" onClick={hasSentCloudLoginCode ? verifyCloudLoginCode : sendCloudLoginCode} disabled={isCloudSyncBusy}>
-                    {hasSentCloudLoginCode ? '登录' : '发送验证码'}
+                  <button type="button" onClick={sendCloudLoginLink} disabled={isCloudSyncBusy}>
+                    发送登录链接
                   </button>
                 </div>
               )}

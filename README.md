@@ -48,7 +48,7 @@ npm run verify:all
 
 ## Supabase 云端同步
 
-交易记录默认保存在浏览器 `localStorage`。配置 Supabase 后，页面会显示邮箱验证码登录，并把交易记录同步到云端；未登录或网络失败时仍保留本地缓存。
+交易记录默认保存在浏览器 `localStorage`。配置 Supabase 后，页面会显示邮箱 Magic Link 登录，并把交易记录同步到云端；未登录或网络失败时仍保留本地缓存。
 
 接入步骤：
 
@@ -62,7 +62,7 @@ cp .env.example .env.local
 npm run build
 ```
 
-Auth 使用邮箱 OTP 验证码登录。`trade_records` 表开启了 Row Level Security，每个登录用户只能访问自己的交易记录。
+Auth 使用邮箱 Magic Link 登录。`trade_records` 表开启了 Row Level Security，每个登录用户只能访问自己的交易记录。
 
 ## 文件职责
 

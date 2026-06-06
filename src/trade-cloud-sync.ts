@@ -74,7 +74,13 @@ export class TradeCloudSync {
   private readonly client: SupabaseClient;
 
   constructor(url: string, anonKey: string) {
-    this.client = createClient(url, anonKey);
+    this.client = createClient(url, anonKey, {
+      auth: {
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+        persistSession: true,
+      },
+    });
   }
 
   async currentUser() {
@@ -91,30 +97,15 @@ export class TradeCloudSync {
     return () => data.subscription.unsubscribe();
   }
 
-  async sendLoginCode(email: string) {
+  async sendLoginLink(email: string, redirectTo: string) {
     const { error } = await this.client.auth.signInWithOtp({
       email,
       options: {
+        emailRedirectTo: redirectTo,
         shouldCreateUser: true,
       },
     });
     requireNoError(error);
-  }
-
-  async verifyLoginCode(email: string, token: string) {
-    const { data, error } = await this.client.auth.verifyOtp({
-      email,
-      token,
-      type: 'email',
-    });
-    requireNoError(error);
-
-    const user = userFromSession(data.session);
-    if (!user) {
-      throw new Error('验证码已通过，但没有拿到登录用户');
-    }
-
-    return user;
   }
 
   async signOut() {
