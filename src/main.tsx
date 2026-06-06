@@ -523,7 +523,7 @@ function App() {
   const [editingDraft, setEditingDraft] = useState<TradeDraft | null>(null);
   const [cloudUser, setCloudUser] = useState<TradeCloudUser | null>(null);
   const [cloudEmail, setCloudEmail] = useState('');
-  const [cloudSyncStatus, setCloudSyncStatus] = useState('云端同步未配置，当前保存到本地浏览器');
+  const [cloudSyncStatus, setCloudSyncStatus] = useState('云端未配置');
   const [isCloudSyncBusy, setIsCloudSyncBusy] = useState(false);
   const [interval, setInterval] = useState<KlineInterval>('1d');
   const [showChart, setShowChart] = useState(true);
@@ -590,7 +590,7 @@ function App() {
 
   useEffect(() => {
     if (!tradeCloudSync) {
-      setCloudSyncStatus('云端同步未配置，当前保存到本地浏览器');
+      setCloudSyncStatus('云端未配置');
       return;
     }
 
@@ -607,7 +607,7 @@ function App() {
         if (user) {
           syncTradesFromCloud(user);
         } else {
-          setCloudSyncStatus('未登录，当前保存到本地浏览器');
+          setCloudSyncStatus('本地模式');
         }
       })
       .catch((error) => {
@@ -625,7 +625,7 @@ function App() {
       if (user) {
         syncTradesFromCloud(user);
       } else {
-        setCloudSyncStatus('未登录，当前保存到本地浏览器');
+        setCloudSyncStatus('本地模式');
       }
     });
 
@@ -694,15 +694,15 @@ function App() {
     const targetPreservingBuy = Math.max(0, Math.min(maxBuyAtLatest, metrics.remainingBtcToTarget));
 
     if (metrics.remainingBtcToTarget <= 0) {
-      messages.push('已经达到 1 BTC 目标。后续只建议在极端低估区间加码，不需要为了达标继续追买。');
+      messages.push('已达到目标。后续只在极端低估区间加码。');
     } else if (metrics.requiredAverageFromNow < metrics.planTargetAverageUsdt * 0.96) {
-      messages.push('剩余预算要求后续均价明显低于自动目标，难度偏高。当前阶段应降低买入频率，等待相对抄底信号再执行下一笔。');
+      messages.push('剩余均衡价偏低，降低频率，等信号。');
     } else if (latestPrice <= metrics.planTargetAverageUsdt) {
-      messages.push(`现价低于自动目标均价 ${currency.format(metrics.planTargetAverageUsdt)} USDT，可以执行一笔小到中等仓位买入。若要守住初始资金约束，本轮最多建议买 ${btcFormat.format(targetPreservingBuy)} BTC。`);
+      messages.push(`现价低于预算均衡价 ${currency.format(metrics.planTargetAverageUsdt)} USDT。小到中等一笔，最多 ${btcFormat.format(targetPreservingBuy)} BTC。`);
     } else if (latestPrice <= metrics.requiredAverageFromNow) {
-      messages.push('现价低于剩余预算所需均价，但高于你的理想目标均价。适合小额定投，不适合一次性打满。');
+      messages.push('低于剩余均衡价，小额推进。');
     } else {
-      messages.push('现价高于达标所需均价。为了当前 USDT 仓位完成 1 BTC，当前应只做小额观察单，主力资金等待更低区间。');
+      messages.push('高于剩余均衡价，等待。');
     }
 
     if (boughtBtc > 0 && metrics.currentBuyAverage > metrics.planTargetAverageUsdt) {
@@ -710,10 +710,10 @@ function App() {
       const neededAtCatchUp =
         (metrics.currentBuyAverage * boughtBtc - metrics.planTargetAverageUsdt * boughtBtc) /
         Math.max(1, metrics.planTargetAverageUsdt - catchUpPrice);
-      messages.push(`当前后续买入均价高于自动目标。若后续能在自动目标下方约 4% 的位置买入，约需 ${btcFormat.format(Math.max(0, neededAtCatchUp))} BTC 才能把后续均价拉回 ${currency.format(metrics.planTargetAverageUsdt)} USDT 附近。`);
+      messages.push(`均价修正量：约 ${btcFormat.format(Math.max(0, neededAtCatchUp))} BTC。`);
     }
 
-    messages.push('建议节奏：默认周定投；主信号出现时执行下一笔；多周期共振时可以提高到计划内金额；极端预备仓只在深度相对回撤和强确认同时出现时动用。');
+    messages.push('默认周定投；主信号执行下一笔；共振时提高金额。');
     return messages;
   }, [latestPrice, metrics, settings]);
 
@@ -727,7 +727,7 @@ function App() {
     }
 
     setIsCloudSyncBusy(true);
-    setCloudSyncStatus('正在同步云端交易记录...');
+    setCloudSyncStatus('同步中...');
 
     try {
       const cloudTrades = await tradeCloudSync.listTrades();
@@ -735,14 +735,14 @@ function App() {
 
       if (cloudTrades.length === 0 && localTrades.length > 0) {
         await tradeCloudSync.saveTrades(localTrades, user);
-        setCloudSyncStatus(`已登录 ${user.email}，已把本地 ${localTrades.length} 条记录上传到云端`);
+        setCloudSyncStatus(`已上传 ${localTrades.length} 条本地记录`);
         return;
       }
 
       setTrades(cloudTrades);
-      setCloudSyncStatus(`已登录 ${user.email}，云端 ${cloudTrades.length} 条记录已同步`);
+      setCloudSyncStatus(`已同步 ${cloudTrades.length} 条记录`);
     } catch (error) {
-      setCloudSyncStatus(`云端同步失败，本地缓存仍可用：${error instanceof Error ? error.message : '未知错误'}`);
+      setCloudSyncStatus(`同步失败：${error instanceof Error ? error.message : '未知错误'}`);
     } finally {
       setIsCloudSyncBusy(false);
     }
@@ -759,7 +759,7 @@ function App() {
       await tradeCloudSync.saveTrade(trade, user);
       setCloudSyncStatus(`已同步到云端：${new Date().toLocaleTimeString()}`);
     } catch (error) {
-      setCloudSyncStatus(`云端保存失败，本地缓存已保存：${error instanceof Error ? error.message : '未知错误'}`);
+      setCloudSyncStatus(`保存失败：${error instanceof Error ? error.message : '未知错误'}`);
     } finally {
       setIsCloudSyncBusy(false);
     }
@@ -775,7 +775,7 @@ function App() {
       await tradeCloudSync.deleteTrade(id);
       setCloudSyncStatus(`云端已删除：${new Date().toLocaleTimeString()}`);
     } catch (error) {
-      setCloudSyncStatus(`云端删除失败，本地缓存已删除：${error instanceof Error ? error.message : '未知错误'}`);
+      setCloudSyncStatus(`删除失败：${error instanceof Error ? error.message : '未知错误'}`);
     } finally {
       setIsCloudSyncBusy(false);
     }
@@ -789,9 +789,9 @@ function App() {
     setIsCloudSyncBusy(true);
     try {
       await tradeCloudSync.deleteTrades(ids);
-      setCloudSyncStatus(`云端记录已清空：${new Date().toLocaleTimeString()}`);
+      setCloudSyncStatus(`已清空：${new Date().toLocaleTimeString()}`);
     } catch (error) {
-      setCloudSyncStatus(`云端清空失败，本地缓存已清空：${error instanceof Error ? error.message : '未知错误'}`);
+      setCloudSyncStatus(`清空失败：${error instanceof Error ? error.message : '未知错误'}`);
     } finally {
       setIsCloudSyncBusy(false);
     }
@@ -837,7 +837,7 @@ function App() {
     try {
       await tradeCloudSync.signOut();
       setCloudUser(null);
-      setCloudSyncStatus('已退出云端同步，当前保存到本地浏览器');
+      setCloudSyncStatus('本地模式');
     } catch (error) {
       setCloudSyncStatus(`退出失败：${error instanceof Error ? error.message : '未知错误'}`);
     } finally {
@@ -925,25 +925,23 @@ function App() {
     <main className="app-shell">
       <section className="hero panel">
         <div>
-          <p className="eyebrow">BTC/USDT Accumulation Terminal</p>
-          <h1>BTC 熊市抄底交易监控台</h1>
-          <p className="hero-copy">
-            记录接下来每笔 BTC 交易，实时计算后续买入均价、剩余缺口、剩余所需均价，并把交易点标到 BTC/USDT K 线上。
-          </p>
+          <p className="eyebrow">BTC/USDT</p>
+          <h1>建仓计划</h1>
+          <p className="hero-copy">仓位 / 预算 / 执行</p>
         </div>
         <div className="target-card">
-          <span>自动目标均价</span>
+          <span>预算均衡价</span>
           <strong>{currency.format(metrics.planTargetAverageUsdt)} USDT</strong>
-          <small>可用 USDT / 初始 BTC 缺口自动计算</small>
+          <small>可用 USDT / 初始 BTC 缺口</small>
         </div>
       </section>
 
       <section className="grid metrics-grid">
         <Metric label="当前总持仓" value={`${btcFormat.format(metrics.currentBtc)} BTC`} hint={`距目标还差 ${btcFormat.format(metrics.remainingBtcToTarget)} BTC`} />
-        <Metric label="后续买入均价" value={metrics.currentBuyAverage ? `${currency.format(metrics.currentBuyAverage)} USDT` : '暂无'} hint={`自动目标 ${currency.format(metrics.planTargetAverageUsdt)} USDT`} />
+        <Metric label="已买均价" value={metrics.currentBuyAverage ? `${currency.format(metrics.currentBuyAverage)} USDT` : '暂无'} hint={`预算均衡价 ${currency.format(metrics.planTargetAverageUsdt)} USDT`} />
         <Metric label="剩余可用仓位" value={`${currency.format(metrics.remainingBudgetUsdt)} USDT`} hint={`已支出 ${currency.format(metrics.spentUsdt)} USDT`} />
-        <Metric label="剩余所需均价" value={metrics.requiredAverageFromNow ? `${currency.format(metrics.requiredAverageFromNow)} USDT` : '已达标'} hint="剩余资金 / 剩余 BTC 缺口" />
-        <Metric label="每周建议定投" value={`${btcFormat.format(metrics.weeklyBtc)} BTC`} hint={
+        <Metric label="剩余均衡价" value={metrics.requiredAverageFromNow ? `${currency.format(metrics.requiredAverageFromNow)} USDT` : '已达标'} hint="剩余资金 / 剩余 BTC 缺口" />
+        <Metric label="周定投" value={`${btcFormat.format(metrics.weeklyBtc)} BTC`} hint={
           metrics.fundingGapUsdt > 0 ? (
             <span style={{ color: '#ffb4b4' }}>
               缺口 {currency.format(metrics.fundingGapUsdt)} USDT<br/>
@@ -1009,9 +1007,9 @@ function App() {
             <input type="date" value={settings.targetDate} onChange={(event) => updateSetting('targetDate', event.target.value)} />
           </label>
           <div className="computed-field">
-            <span>自动目标均价</span>
+            <span>预算均衡价</span>
             <strong>{currency.format(metrics.planTargetAverageUsdt)} USDT</strong>
-            <small>由可用仓位和目标 BTC 自动推出，不需要手动填。</small>
+            <small>可用 USDT / 初始 BTC 缺口</small>
           </div>
         </aside>
       </section>
@@ -1019,7 +1017,7 @@ function App() {
       <section className="layout lower-layout">
         <div className="trade-workspace">
           <div className="panel trade-entry-panel">
-            <h2>录入交易</h2>
+            <h2>录入</h2>
             <form className="trade-form" onSubmit={submitTrade}>
               <label>
                 日期
@@ -1045,7 +1043,7 @@ function App() {
                 <input value={draft.note} placeholder="例如：主信号买入 / DCA / 清扫补仓" onChange={(event) => setDraft({ ...draft, note: event.target.value })} />
               </label>
               <div className="trade-form-actions">
-                <button type="submit">保存交易</button>
+                <button type="submit">保存</button>
               </div>
             </form>
           </div>
@@ -1053,14 +1051,14 @@ function App() {
           <section className="panel records-panel">
             <div className="section-title">
               <div>
-                <h2>交易记录</h2>
-                <p>{cloudUser ? '数据会同步到 Supabase，同时保留本地缓存。' : '未登录时数据保存在当前浏览器本地。'}</p>
+                <h2>记录</h2>
+                <p>{cloudUser ? 'Supabase' : '本地'}</p>
               </div>
-              <button className="ghost-button" onClick={resetDemoData}>清空记录</button>
+              <button className="ghost-button" onClick={resetDemoData}>清空</button>
             </div>
             <div className="cloud-sync-panel">
               <div>
-                <span>{tradeCloudSync ? 'Supabase 云端同步' : 'Supabase 未配置'}</span>
+                <span>{tradeCloudSync ? '云端同步' : '云端未配置'}</span>
                 <strong>{cloudUser ? cloudUser.email : cloudSyncStatus}</strong>
                 {cloudUser && <small>{cloudSyncStatus}</small>}
               </div>
@@ -1112,7 +1110,7 @@ function App() {
                 <tbody>
                   {trades.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="empty-cell">还没有交易记录。先录入下一笔买入，图上会自动出现标记。</td>
+                      <td colSpan={7} className="empty-cell">暂无记录</td>
                     </tr>
                   ) : (
                     trades.map((trade) => {
@@ -1168,7 +1166,7 @@ function App() {
         </div>
 
         <div className="panel advice-panel">
-          <h2>本轮抄底建议</h2>
+          <h2>下一笔</h2>
           <ExecutionDecisionCard rows={timeframeSignals} />
           <ActionSummary
             signal={bottomSignal}
@@ -1179,7 +1177,7 @@ function App() {
             advice={advice}
           />
           <button className="research-toggle" onClick={() => setShowResearch((current) => !current)}>
-            {showResearch ? '收起研究依据' : '展开研究依据'}
+            {showResearch ? '收起研究' : '研究'}
           </button>
           {showResearch && (
             <div className="research-stack">
@@ -1222,25 +1220,25 @@ function ExecutionDecisionCard(props: { rows: TimeframeSignalRow[] }) {
   const hasStrongFourHourDrop = props.rows.some(isStrongFourHourDropSignal);
 
   let level = 'wait';
-  let title = '默认：继续周定投，不加速';
-  let summary = '当前没有形成足够的多周期共振。按计划推进，避免因为单根 K 线提前打掉预备仓。';
-  let action = '只执行既定周定投；不提高单笔金额。';
+  let title = '等待';
+  let summary = '共振不足，按计划。';
+  let action = '维持周定投。';
 
   if (hasPrimaryBuy && ((hasDailyBuy && hasFourHourBuy) || (hasDailyBuy && hasWeeklyBuy))) {
     level = 'buy';
-    title = '加速：可以执行下一笔计划内买入';
-    summary = `当前 ${buyLabels} 出现相对抄底信号，并包含长样本更稳的主信号。${hasStrongFourHourDrop ? '4H 回撤已进入强确认区。' : ''}`;
-    action = '可以买下一笔计划内金额；仍不要一次性打满剩余仓位。';
+    title = '加速';
+    summary = `${buyLabels} 出现相对信号，并包含长样本主信号。${hasStrongFourHourDrop ? '4H 回撤已进入强确认区。' : ''}`;
+    action = '执行下一笔计划金额。';
   } else if (hasPrimaryBuy || (hasFourHourBuy && hasWeeklyBuy)) {
     level = 'buy';
-    title = '可买：执行小到中等一笔';
-    summary = `当前 ${buyLabels} 出现信号，但共振或稳定性还不完整。${hasStrongFourHourDrop ? '4H 回撤较深，优先级高于普通 4H 信号。' : ''}`;
-    action = '可以买一笔小到中等仓位，用作计划内推进。';
+    title = '可买';
+    summary = `${buyLabels} 出现信号，共振尚未完整。${hasStrongFourHourDrop ? '4H 回撤较深。' : ''}`;
+    action = '小到中等一笔。';
   } else if (hasFourHourBuy || hasDailyWatch || hasFourHourWatch) {
     level = 'watch';
-    title = '观察：等下一根确认';
-    summary = buyLabels ? `当前只有 ${buyLabels} 给出买入信号，但不是长样本主信号。` : `当前 ${watchLabels || '部分周期'} 接近止跌，但还没有买入确认。`;
-    action = '不加速；如果下一根 4H/1D 继续收回，再执行下一笔。';
+    title = '观察';
+    summary = buyLabels ? `只有 ${buyLabels} 给出信号。` : `${watchLabels || '部分周期'} 接近止跌。`;
+    action = '等下一根确认。';
   }
 
   return (
@@ -1274,8 +1272,8 @@ function ActionSummary(props: {
   return (
     <div className="action-summary">
       <div className="action-focus">
-        <span>当前执行</span>
-        <strong>{props.advice[0] ?? '继续等待相对抄底信号。'}</strong>
+        <span>动作</span>
+        <strong>{props.advice[0] ?? '继续等待相对信号。'}</strong>
       </div>
       <div className="action-facts">
         <div>
@@ -1292,9 +1290,9 @@ function ActionSummary(props: {
         </div>
       </div>
       <div className="action-reasons">
-        <span>{props.signal ? `当前周期：${props.signal.signalName}` : '当前周期：数据不足'}</span>
-        <span>现价较剩余所需均价 {priceGap >= 0 ? '高' : '低'} {currency.format(Math.abs(priceGap))} USDT</span>
-        <span>自动目标均价 {currency.format(props.planTargetAverage)} USDT</span>
+        <span>{props.signal ? props.signal.signalName : '数据不足'}</span>
+        <span>现价较剩余均衡价 {priceGap >= 0 ? '高' : '低'} {currency.format(Math.abs(priceGap))} USDT</span>
+        <span>预算均衡价 {currency.format(props.planTargetAverage)} USDT</span>
       </div>
       <p>{props.advice[props.advice.length - 1]}</p>
     </div>
@@ -1315,8 +1313,8 @@ function BottomSignalCard(props: { signal: BottomSignal | null }) {
   if (!props.signal) {
     return (
       <div className="signal-card signal-card-wait">
-        <strong>相对抄底信号计算中</strong>
-        <p>K 线数据不足，暂时只执行既定周定投，不因为现价位置加速。</p>
+        <strong>相对信号计算中</strong>
+        <p>K 线数据不足，维持既定节奏。</p>
       </div>
     );
   }
@@ -1404,7 +1402,7 @@ function SignalBacktestCard(props: { backtest: SignalBacktest | null }) {
         </span>
       </div>
       {props.backtest.totalSignals < 5 && (
-        <p className="backtest-warning">样本偏少，只能辅助判断，不单独作为买入依据。</p>
+        <p className="backtest-warning">样本偏少，仅供参考。</p>
       )}
       <div className="backtest-grid">
         {props.backtest.horizons.map((horizon) => (
@@ -1426,7 +1424,7 @@ function StrategyBacktestCard(props: { backtest: StrategyBacktest | null }) {
     return (
       <div className="backtest-card">
         <strong>策略回测</strong>
-        <p>日线数据不足，暂时无法比较定投策略。</p>
+        <p>日线数据不足。</p>
       </div>
     );
   }
@@ -1439,17 +1437,17 @@ function StrategyBacktestCard(props: { backtest: StrategyBacktest | null }) {
     <div className="backtest-card">
       <div className="backtest-header">
         <strong>策略回测</strong>
-        <span>{props.backtest.samples} 个熊市窗口</span>
+        <span>{props.backtest.samples} 个窗口</span>
       </div>
       <p className="backtest-warning">
-        这块不是当前买入信号，只是在比较“未来 150 天怎么把剩余 BTC 买完”。
+        比较未来 150 天的执行路径。
       </p>
       <p className="backtest-note">
-        当前样本里「{best.name}」平均效率最高，较周定投 {bestAdvantage >= 0 ? '高' : '低'} {percentFormat(Math.abs(bestAdvantage))}。样本只有 {props.backtest.samples} 个窗口，只能作为执行框架参考。
+        「{best.name}」平均效率最高，较周定投 {bestAdvantage >= 0 ? '高' : '低'} {percentFormat(Math.abs(bestAdvantage))}。
       </p>
       <div className="backtest-explain">
-        <span>效率越高，说明买入均价越靠近窗口低点。</span>
-        <span>下四分位越高，说明差行情里也不太差。</span>
+        <span>效率越高，买入均价越靠近窗口低点。</span>
+        <span>下四分位越高，弱行情表现越稳。</span>
         <span>完成率表示 150 天内是否买够目标 BTC。</span>
       </div>
       <div className="strategy-backtest-list">
@@ -1924,7 +1922,7 @@ function CandlestickChart(props: {
           return (
             <g key={signal.time} className="bottom-signal-marker">
               <path d={`M ${x} ${y - 7} L ${x + 7} ${y} L ${x} ${y + 7} L ${x - 7} ${y} Z`} />
-              <text x={x + 10} y={y + 4}>抄底</text>
+              <text x={x + 10} y={y + 4}>信号</text>
             </g>
           );
         })}
@@ -1972,8 +1970,8 @@ function CandlestickChart(props: {
       </div>
       <div className="chart-footer">
         <div className="chart-reference-panel">
-          {props.layers.planLines && <div><i className="required-swatch" />剩余所需均价 <strong>{props.requiredAverage > 0 ? currency.format(props.requiredAverage) : '达标'} USDT</strong></div>}
-          {props.layers.planLines && <div><i className="target-swatch" />自动目标均价 <strong>{currency.format(props.targetAverage)} USDT</strong></div>}
+          {props.layers.planLines && <div><i className="required-swatch" />剩余均衡价 <strong>{props.requiredAverage > 0 ? currency.format(props.requiredAverage) : '达标'} USDT</strong></div>}
+          {props.layers.planLines && <div><i className="target-swatch" />预算均衡价 <strong>{currency.format(props.targetAverage)} USDT</strong></div>}
           {props.layers.averages && <div><i className="ma20-swatch" />MA20 / MA60</div>}
           {props.layers.bollinger && <div><i className="bollinger-swatch" />布林带</div>}
         </div>
