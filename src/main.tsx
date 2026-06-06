@@ -412,7 +412,7 @@ function signedTradeCostUsdt(trade: Trade) {
 
 function useBtcCandles(interval: KlineInterval) {
   const [candles, setCandles] = useState<Candle[]>([]);
-  const [status, setStatus] = useState('加载 BTC/USDT K 线中...');
+  const [status, setStatus] = useState('加载 BTC/USDT...');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -493,7 +493,7 @@ function useBtcCandles(interval: KlineInterval) {
       } catch (error) {
         if (isActive) {
           const message = error instanceof Error ? error.message : '未知错误';
-          setError(`K 线加载失败：${message}`);
+          setError(`行情加载失败：${message}`);
           setStatus(`BTC/USDT ${selectedInterval.label}`);
         }
       } finally {
@@ -735,12 +735,12 @@ function App() {
 
       if (cloudTrades.length === 0 && localTrades.length > 0) {
         await tradeCloudSync.saveTrades(localTrades, user);
-        setCloudSyncStatus(`已上传 ${localTrades.length} 条本地记录`);
+        setCloudSyncStatus(`已上传 ${localTrades.length} 条`);
         return;
       }
 
       setTrades(cloudTrades);
-      setCloudSyncStatus(`已同步 ${cloudTrades.length} 条记录`);
+      setCloudSyncStatus(`已同步 ${cloudTrades.length} 条`);
     } catch (error) {
       setCloudSyncStatus(`同步失败：${error instanceof Error ? error.message : '未知错误'}`);
     } finally {
@@ -805,7 +805,7 @@ function App() {
     setIsCloudSyncBusy(true);
     try {
       await tradeCloudSync.sendLoginLink(cloudEmail.trim(), `${window.location.origin}${window.location.pathname}`);
-      setCloudSyncStatus(`登录链接已发送到 ${cloudEmail.trim()}，请打开邮件完成登录`);
+      setCloudSyncStatus(`已发送到 ${cloudEmail.trim()}`);
     } catch (error) {
       setCloudSyncStatus(`登录链接发送失败：${error instanceof Error ? error.message : '未知错误'}`);
     } finally {
@@ -820,7 +820,7 @@ function App() {
 
     setIsCloudSyncBusy(true);
     try {
-      setCloudSyncStatus('正在跳转到 GitHub 登录...');
+      setCloudSyncStatus('跳转 GitHub...');
       await tradeCloudSync.signInWithGitHub(`${window.location.origin}${window.location.pathname}`);
     } catch (error) {
       setCloudSyncStatus(`GitHub 登录失败：${error instanceof Error ? error.message : '未知错误'}`);
@@ -937,7 +937,7 @@ function App() {
       </section>
 
       <section className="grid metrics-grid">
-        <Metric label="当前总持仓" value={`${btcFormat.format(metrics.currentBtc)} BTC`} hint={`距目标还差 ${btcFormat.format(metrics.remainingBtcToTarget)} BTC`} />
+        <Metric label="持仓" value={`${btcFormat.format(metrics.currentBtc)} BTC`} hint={`差 ${btcFormat.format(metrics.remainingBtcToTarget)} BTC`} />
         <Metric label="已买均价" value={metrics.currentBuyAverage ? `${currency.format(metrics.currentBuyAverage)} USDT` : '暂无'} hint={`预算均衡价 ${currency.format(metrics.planTargetAverageUsdt)} USDT`} />
         <Metric label="剩余可用仓位" value={`${currency.format(metrics.remainingBudgetUsdt)} USDT`} hint={`已支出 ${currency.format(metrics.spentUsdt)} USDT`} />
         <Metric label="剩余均衡价" value={metrics.requiredAverageFromNow ? `${currency.format(metrics.requiredAverageFromNow)} USDT` : '已达标'} hint="剩余资金 / 剩余 BTC 缺口" />
@@ -957,7 +957,7 @@ function App() {
         <div className="panel chart-panel">
           <div className="section-title">
             <div>
-              <h2>BTC/USDT K 线 <button className="link-button" style={{ marginLeft: '12px', fontSize: '12px' }} onClick={() => setShowChart(!showChart)}>{showChart ? '隐藏' : '显示'}</button></h2>
+              <h2>BTC/USDT <button className="link-button" style={{ marginLeft: '12px', fontSize: '12px' }} onClick={() => setShowChart(!showChart)}>{showChart ? '收起' : '展开'}</button></h2>
               <p>{status}</p>
             </div>
             <div className="chart-actions">
@@ -967,7 +967,7 @@ function App() {
                 <button className={chartLayers.volume ? 'active' : ''} onClick={() => toggleChartLayer('volume')}>VOL</button>
                 <button className={chartLayers.signals ? 'active' : ''} onClick={() => toggleChartLayer('signals')}>信号</button>
                 <button className={chartLayers.trades ? 'active' : ''} onClick={() => toggleChartLayer('trades')}>交易</button>
-                <button className={chartLayers.planLines ? 'active' : ''} onClick={() => toggleChartLayer('planLines')}>计划线</button>
+                <button className={chartLayers.planLines ? 'active' : ''} onClick={() => toggleChartLayer('planLines')}>均衡线</button>
               </div>
               <div className="interval-tabs">
                 {intervalOptions.map((option) => (
@@ -998,7 +998,7 @@ function App() {
         </div>
 
         <aside className="panel settings-panel">
-          <h2>计划参数</h2>
+          <h2>计划</h2>
           <NumberField label="已有 BTC" value={settings.existingBtc} step="0.01" onChange={(value) => updateSetting('existingBtc', value)} />
           <NumberField label="目标 BTC" value={settings.targetBtc} step="0.01" onChange={(value) => updateSetting('targetBtc', value)} />
           <NumberField label="BTC 可用仓位 USDT" value={settings.availableUsdt} step="100" onChange={(value) => updateSetting('availableUsdt', value)} />
@@ -1074,7 +1074,7 @@ function App() {
                     onChange={(event) => setCloudEmail(event.target.value)}
                   />
                   <button type="button" onClick={sendCloudLoginLink} disabled={isCloudSyncBusy}>
-                    发送登录链接
+                    邮件登录
                   </button>
                 </div>
               )}
@@ -1110,7 +1110,7 @@ function App() {
                 <tbody>
                   {trades.length === 0 ? (
                     <tr>
-                      <td colSpan={7} className="empty-cell">暂无记录</td>
+                      <td colSpan={7} className="empty-cell">空</td>
                     </tr>
                   ) : (
                     trades.map((trade) => {
@@ -1177,7 +1177,7 @@ function App() {
             advice={advice}
           />
           <button className="research-toggle" onClick={() => setShowResearch((current) => !current)}>
-            {showResearch ? '收起研究' : '研究'}
+            {showResearch ? '收起' : '展开'}
           </button>
           {showResearch && (
             <div className="research-stack">
@@ -1314,7 +1314,7 @@ function BottomSignalCard(props: { signal: BottomSignal | null }) {
     return (
       <div className="signal-card signal-card-wait">
         <strong>相对信号计算中</strong>
-        <p>K 线数据不足，维持既定节奏。</p>
+        <p>数据不足，维持节奏。</p>
       </div>
     );
   }
@@ -1334,7 +1334,7 @@ function BottomSignalCard(props: { signal: BottomSignal | null }) {
         <SignalCheck label="日线收回" active={props.signal.closeRecovered || props.signal.bullishReversal} />
       </div>
       <small>
-        最新 K 线：低点 {currency.format(props.signal.latestLow)}，收盘 {currency.format(props.signal.latestClose)} USDT
+        低点 {currency.format(props.signal.latestLow)}，收盘 {currency.format(props.signal.latestClose)} USDT
       </small>
     </div>
   );
@@ -1388,7 +1388,7 @@ function SignalBacktestCard(props: { backtest: SignalBacktest | null }) {
     return (
       <div className="backtest-card">
         <strong>信号回测</strong>
-        <p>K 线数据不足，暂时无法回测。</p>
+        <p>数据不足。</p>
       </div>
     );
   }
@@ -1617,7 +1617,7 @@ function CandlestickChart(props: {
   }, []);
 
   if (props.candles.length === 0) {
-    return <div className="chart-placeholder">正在加载 K 线...</div>;
+    return <div className="chart-placeholder">加载中...</div>;
   }
 
   const maxVisibleCount = props.candles.length;
