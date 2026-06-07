@@ -57,6 +57,9 @@ type ChartLayers = {
   volume: boolean;
   signals: boolean;
   trades: boolean;
+  tradePriceLines: boolean;
+  tradeTriangles: boolean;
+  scaleTradeTriangles: boolean;
   planLines: boolean;
 };
 
@@ -536,6 +539,9 @@ function App() {
     volume: true,
     signals: true,
     trades: true,
+    tradePriceLines: true,
+    tradeTriangles: true,
+    scaleTradeTriangles: true,
     planLines: true,
   });
   const { candles, error, isLoading, status } = useBtcCandles(interval);
@@ -954,7 +960,14 @@ function App() {
                 <button className={chartLayers.bollinger ? 'active' : ''} onClick={() => toggleChartLayer('bollinger')}>BOLL</button>
                 <button className={chartLayers.volume ? 'active' : ''} onClick={() => toggleChartLayer('volume')}>VOL</button>
                 <button className={chartLayers.signals ? 'active' : ''} onClick={() => toggleChartLayer('signals')}>信号</button>
-                <button className={chartLayers.trades ? 'active' : ''} onClick={() => toggleChartLayer('trades')}>交易</button>
+                <div className="trade-layer-menu">
+                  <button className={chartLayers.trades ? 'active' : ''} onClick={() => toggleChartLayer('trades')}>交易</button>
+                  <div className="trade-layer-popover">
+                    <button className={chartLayers.tradePriceLines ? 'active' : ''} disabled={!chartLayers.trades} onClick={() => toggleChartLayer('tradePriceLines')}>线</button>
+                    <button className={chartLayers.tradeTriangles ? 'active' : ''} disabled={!chartLayers.trades} onClick={() => toggleChartLayer('tradeTriangles')}>三角</button>
+                    <button className={chartLayers.scaleTradeTriangles ? 'active' : ''} disabled={!chartLayers.trades || !chartLayers.tradeTriangles} onClick={() => toggleChartLayer('scaleTradeTriangles')}>比例</button>
+                  </div>
+                </div>
                 <button className={chartLayers.planLines ? 'active' : ''} onClick={() => toggleChartLayer('planLines')}>均衡线</button>
               </div>
               <div className="interval-tabs">
@@ -1523,6 +1536,53 @@ function percentileNumber(values: number[], percentile: number) {
   return sorted[index];
 }
 
+function localDateKeyFromTime(time: number) {
+  const date = new Date(time);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function distanceToCandlePriceRange(candle: Candle, price: number) {
+  if (price >= candle.low && price <= candle.high) {
+    return 0;
+  }
+
+  return Math.min(Math.abs(price - candle.low), Math.abs(price - candle.high));
+}
+
+function findTradeMarkerCandleIndex(trade: Trade, candles: Candle[]) {
+  const sameDayIndexes = candles
+    .map((candle, index) => ({ candle, index }))
+    .filter(({ candle }) => localDateKeyFromTime(candle.time) === trade.date);
+
+  const containingCandle = sameDayIndexes.find(({ candle }) => trade.priceUsdt >= candle.low && trade.priceUsdt <= candle.high);
+  if (containingCandle) {
+    return containingCandle.index;
+  }
+
+  if (sameDayIndexes.length > 0) {
+    return sameDayIndexes.reduce((best, current) => (
+      distanceToCandlePriceRange(current.candle, trade.priceUsdt) < distanceToCandlePriceRange(best.candle, trade.priceUsdt) ? current : best
+    )).index;
+  }
+
+  const tradeTime = new Date(`${trade.date}T00:00:00`).getTime();
+  let nearestIndex = 0;
+  let nearestDistance = Number.POSITIVE_INFINITY;
+
+  candles.forEach((candle, index) => {
+    const distance = Math.abs(candle.time - tradeTime);
+    if (distance < nearestDistance) {
+      nearestDistance = distance;
+      nearestIndex = index;
+    }
+  });
+
+  return nearestIndex;
+}
+
 function CandlestickChart(props: {
   candles: Candle[];
   trades: Trade[];
@@ -1544,6 +1604,7 @@ function CandlestickChart(props: {
     startPriceRange: 1,
   });
   const [hoveredCandle, setHoveredCandle] = useState<Candle | null>(null);
+  const [hoveredTradeId, setHoveredTradeId] = useState<string | null>(null);
   const [isDragging, setIsDragging] = useState(false);
   const [visibleCount, setVisibleCount] = useState(120);
   const [rightIndex, setRightIndex] = useState(0);
@@ -1620,21 +1681,25 @@ function CandlestickChart(props: {
 
   const tradeMarkers = props.trades
     .map((trade) => {
-      const tradeTime = new Date(`${trade.date}T00:00:00`).getTime();
-      let nearestIndex = 0;
-      let nearestDistance = Number.POSITIVE_INFINITY;
-
-      props.candles.forEach((candle, index) => {
-        const distance = Math.abs(candle.time - tradeTime);
-        if (distance < nearestDistance) {
-          nearestDistance = distance;
-          nearestIndex = index;
-        }
-      });
-
-      return { trade, index: nearestIndex };
+      return { trade, index: findTradeMarkerCandleIndex(trade, props.candles) };
     })
     .filter((marker) => marker.index >= visibleStart && marker.index <= visibleEnd);
+  const buyTradeAmounts = props.trades
+    .filter((trade) => trade.side === 'buy')
+    .map((trade) => trade.btcAmount)
+    .filter((amount) => Number.isFinite(amount) && amount > 0);
+  const maxBuyTradeAmount = buyTradeAmounts.length > 0 ? Math.max(...buyTradeAmounts) : 0;
+  const relativeTradeWeight = (trade: Trade) => {
+    if (trade.side !== 'buy') {
+      return 0.6;
+    }
+
+    if (maxBuyTradeAmount <= 0) {
+      return 0.6;
+    }
+
+    return clamp(trade.btcAmount / maxBuyTradeAmount, 0.12, 1);
+  };
 
   const signalMarkers = props.bottomSignals
     .map((signal) => {
@@ -1892,14 +1957,60 @@ function CandlestickChart(props: {
           );
         })}
         {props.layers.trades && tradeMarkers.map(({ trade, index }) => {
+          const candle = props.candles[index];
           const x = xScale(index);
           const y = yScale(trade.priceUsdt);
           const isBuy = trade.side === 'buy';
+          const markerWeight = props.layers.scaleTradeTriangles ? relativeTradeWeight(trade) : 1;
+          const priceLineHalfWidth = clamp(bodyWidth * 0.56, 3, 13);
+          const priceLineWidth = clamp(bodyWidth * 0.16, 1.8, 3.1);
+          const triangleHalfWidth = 3.5 + markerWeight * 4.9;
+          const triangleTopOffset = 4.9 + markerWeight * 3.5;
+          const triangleBottomOffset = 2.8 + markerWeight * 2.45;
+          const lowY = candle ? yScale(candle.low) : y;
+          const labelAnchorY = Math.max(lowY, y);
+          const labelTriangleY = clamp(labelAnchorY + 24 + markerWeight * 5, padding.top + 14, pricePaneBottom - 18);
+          const tooltipWidth = 190;
+          const tooltipHeight = trade.note ? 72 : 56;
+          const tooltipX = clamp(x + 14, padding.left + 4, width - padding.right - tooltipWidth - 4);
+          const tooltipY = clamp(labelTriangleY + 16, padding.top + 4, pricePaneBottom - tooltipHeight - 4);
+          const tradeTotal = trade.btcAmount * trade.priceUsdt;
 
           return (
-            <g key={trade.id} className={isBuy ? 'trade-buy' : 'trade-sell'}>
-              <circle cx={x} cy={y} r="6" />
-              <text x={x + 9} y={y - 9}>{isBuy ? 'B' : 'S'} {currency.format(trade.priceUsdt)}</text>
+            <g
+              key={trade.id}
+              className={`trade-marker ${isBuy ? 'trade-buy' : 'trade-sell'}`}
+              onPointerEnter={() => setHoveredTradeId(trade.id)}
+              onPointerLeave={() => setHoveredTradeId((current) => current === trade.id ? null : current)}
+            >
+              {props.layers.tradePriceLines && (
+                <>
+                  <line className="trade-hit-line" x1={x - Math.max(12, priceLineHalfWidth)} x2={x + Math.max(12, priceLineHalfWidth)} y1={y} y2={y} />
+                  <line className="trade-price-shadow" x1={x - priceLineHalfWidth} x2={x + priceLineHalfWidth} y1={y} y2={y} style={{ strokeWidth: priceLineWidth + 2.8 }} />
+                  <line className="trade-price-line" x1={x - priceLineHalfWidth} x2={x + priceLineHalfWidth} y1={y} y2={y} style={{ strokeWidth: priceLineWidth }} />
+                </>
+              )}
+              {props.layers.tradeTriangles && (
+                <>
+                  <path
+                    className="trade-label-halo"
+                    d={`M ${x} ${labelTriangleY - triangleTopOffset} L ${x + triangleHalfWidth} ${labelTriangleY + triangleBottomOffset} L ${x - triangleHalfWidth} ${labelTriangleY + triangleBottomOffset} Z`}
+                  />
+                  <path
+                    className="trade-label-triangle"
+                    d={`M ${x} ${labelTriangleY - triangleTopOffset} L ${x + triangleHalfWidth} ${labelTriangleY + triangleBottomOffset} L ${x - triangleHalfWidth} ${labelTriangleY + triangleBottomOffset} Z`}
+                  />
+                </>
+              )}
+              {hoveredTradeId === trade.id && (
+                <g className="trade-tooltip">
+                  <rect x={tooltipX} y={tooltipY} width={tooltipWidth} height={tooltipHeight} rx="6" />
+                  <text x={tooltipX + 10} y={tooltipY + 18}>{isBuy ? 'Buy' : 'Sell'} · {trade.date}</text>
+                  <text x={tooltipX + 10} y={tooltipY + 36}>{btcFormat.format(trade.btcAmount)} BTC @ {currency.format(trade.priceUsdt)}</text>
+                  <text x={tooltipX + 10} y={tooltipY + 52}>合计 {currency.format(tradeTotal)} USDT</text>
+                  {trade.note && <text x={tooltipX + 10} y={tooltipY + 68}>{trade.note}</text>}
+                </g>
+              )}
             </g>
           );
         })}
