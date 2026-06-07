@@ -302,6 +302,40 @@ h2 {
   position: relative;
 }
 
+.chart-loading-badge {
+  position: absolute;
+  z-index: 4;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid #242424;
+  border-radius: 7px;
+  padding: 7px 10px;
+  color: #ededed;
+  background: rgb(5 5 5 / 86%);
+  box-shadow: 0 10px 24px rgb(0 0 0 / 35%);
+  font-size: 12px;
+  font-weight: 800;
+  backdrop-filter: blur(8px);
+}
+
+.chart-loading-badge span {
+  width: 12px;
+  height: 12px;
+  border: 2px solid #353535;
+  border-top-color: #36f4ff;
+  border-radius: 999px;
+  animation: chart-loading-spin 760ms linear infinite;
+}
+
+@keyframes chart-loading-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
 .chart-viewport {
   width: 100%;
   overflow: hidden;

@@ -73,11 +73,11 @@ const defaultSettings: PlanSettings = {
 };
 
 const intervalOptions: Array<{ label: string; value: KlineInterval; limit: number }> = [
-  { label: '1H', value: '1h', limit: 500 },
-  { label: '4H', value: '4h', limit: 500 },
-  { label: '1D', value: '1d', limit: 365 },
-  { label: '1W', value: '1w', limit: 260 },
-  { label: '1M', value: '1M', limit: 120 },
+  { label: '1H', value: '1h', limit: 2000 },
+  { label: '4H', value: '4h', limit: 2000 },
+  { label: '1D', value: '1d', limit: 2000 },
+  { label: '1W', value: '1w', limit: 520 },
+  { label: '1M', value: '1M', limit: 240 },
 ];
 
 const barsPerDayByInterval: Record<KlineInterval, number> = {
@@ -134,6 +134,12 @@ function normalizeStoredTrade(trade: Partial<Trade>): Trade | null {
 const currency = new Intl.NumberFormat('en-US', { maximumFractionDigits: 0 });
 const btcFormat = new Intl.NumberFormat('en-US', { maximumFractionDigits: 6 });
 const klineCache = new Map<string, { candles: Candle[]; provider: KlineProvider }>();
+const klineStorageKey = 'btc-dca-monitor-kline-cache-v1';
+
+type StoredKlineCache = {
+  version: 1;
+  intervals?: Partial<Record<KlineInterval, { provider: KlineProvider; savedAt: number; candles: Candle[] }>>;
+};
 
 const okxBarByInterval: Record<KlineInterval, string> = {
   '1h': '1H',
@@ -160,11 +166,11 @@ const gateIntervalByInterval: Record<KlineInterval, string> = {
 };
 
 const cryptoCompareConfigByInterval: Record<KlineInterval, { endpoint: 'histohour' | 'histoday'; aggregate: number; limit: number }> = {
-  '1h': { endpoint: 'histohour', aggregate: 1, limit: 500 },
-  '4h': { endpoint: 'histohour', aggregate: 4, limit: 500 },
-  '1d': { endpoint: 'histoday', aggregate: 1, limit: 365 },
-  '1w': { endpoint: 'histoday', aggregate: 7, limit: 260 },
-  '1M': { endpoint: 'histoday', aggregate: 30, limit: 120 },
+  '1h': { endpoint: 'histohour', aggregate: 1, limit: 2000 },
+  '4h': { endpoint: 'histohour', aggregate: 4, limit: 2000 },
+  '1d': { endpoint: 'histoday', aggregate: 1, limit: 2000 },
+  '1w': { endpoint: 'histoday', aggregate: 7, limit: 520 },
+  '1M': { endpoint: 'histoday', aggregate: 30, limit: 240 },
 };
 
 const intervalMsByInterval: Record<KlineInterval, number> = {
@@ -228,6 +234,86 @@ function closedCandles(candles: Candle[], interval: KlineInterval) {
   const now = Date.now();
   const intervalMs = intervalMsByInterval[interval];
   return candles.filter((candle) => candle.time + intervalMs <= now);
+}
+
+function normalizeCandle(candle: Partial<Candle>): Candle | null {
+  const normalized = {
+    time: Number(candle.time),
+    open: Number(candle.open),
+    high: Number(candle.high),
+    low: Number(candle.low),
+    close: Number(candle.close),
+    volume: Math.max(0, Number(candle.volume ?? 0)),
+  };
+
+  if (
+    !Number.isFinite(normalized.time) ||
+    !Number.isFinite(normalized.open) ||
+    !Number.isFinite(normalized.high) ||
+    !Number.isFinite(normalized.low) ||
+    !Number.isFinite(normalized.close)
+  ) {
+    return null;
+  }
+
+  return normalized;
+}
+
+function mergeCandles(...candleSets: Candle[][]) {
+  const byTime = new Map<number, Candle>();
+
+  candleSets.flat().forEach((candle) => {
+    const normalized = normalizeCandle(candle);
+    if (normalized) {
+      byTime.set(normalized.time, normalized);
+    }
+  });
+
+  return [...byTime.values()].sort((a, b) => a.time - b.time);
+}
+
+function readStoredKlineCache(interval: KlineInterval) {
+  try {
+    const stored = window.localStorage.getItem(klineStorageKey);
+    if (!stored) {
+      return null;
+    }
+
+    const parsed = JSON.parse(stored) as StoredKlineCache;
+    const intervalCache = parsed.intervals?.[interval];
+    if (!intervalCache?.candles?.length) {
+      return null;
+    }
+
+    const candles = mergeCandles(intervalCache.candles);
+    if (candles.length === 0) {
+      return null;
+    }
+
+    return {
+      candles,
+      provider: intervalCache.provider,
+      savedAt: Number(intervalCache.savedAt) || 0,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function writeStoredKlineCache(interval: KlineInterval, provider: KlineProvider, candles: Candle[]) {
+  try {
+    const stored = window.localStorage.getItem(klineStorageKey);
+    const parsed = stored ? (JSON.parse(stored) as StoredKlineCache) : { version: 1 as const, intervals: {} };
+    const intervals = parsed.intervals ?? {};
+    intervals[interval] = {
+      provider,
+      savedAt: Date.now(),
+      candles: mergeCandles(candles),
+    };
+    window.localStorage.setItem(klineStorageKey, JSON.stringify({ version: 1, intervals }));
+  } catch {
+    // Cache writes are best effort; quota or privacy mode should not block chart rendering.
+  }
 }
 
 async function fetchCryptoCompareCandles(interval: KlineInterval, signal: AbortSignal): Promise<Candle[]> {
@@ -355,7 +441,7 @@ async function fetchOkxCandles(interval: KlineInterval, limit: number, signal: A
 
 async function fetchBinanceCandles(interval: KlineInterval, limit: number, signal: AbortSignal): Promise<Candle[]> {
   const response = await fetch(
-    `https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=${interval}&limit=${limit}`,
+    `https://api.binance.com/api/v3/klines?symbol=BTCUSDT&interval=${interval}&limit=${Math.min(limit, 1000)}`,
     { signal },
   );
 
@@ -423,6 +509,7 @@ function useBtcCandles(interval: KlineInterval) {
     let isActive = true;
     const providerControllers: AbortController[] = [];
     const cachedCandles = klineCache.get(interval);
+    const storedCandles = cachedCandles ? null : readStoredKlineCache(interval);
     const selectedInterval = intervalOptions.find((option) => option.value === interval) ?? intervalOptions[2];
 
     if (useRuntimeFixtureCandles()) {
@@ -435,16 +522,21 @@ function useBtcCandles(interval: KlineInterval) {
 
     if (cachedCandles) {
       setCandles(cachedCandles.candles);
-      setStatus(`${cachedCandles.provider} BTC/USDT ${selectedInterval.label}`);
+      setStatus(`${cachedCandles.provider} BTC/USDT ${selectedInterval.label} (缓存)`);
       setError('');
-      setIsLoading(false);
-      return;
+    } else if (storedCandles) {
+      klineCache.set(interval, { candles: storedCandles.candles, provider: storedCandles.provider });
+      setCandles(storedCandles.candles);
+      setStatus(`${storedCandles.provider} BTC/USDT ${selectedInterval.label} (本地缓存)`);
+      setError('');
+    } else {
+      setCandles([]);
     }
 
     function loadProviderWithTimeout(candidate: { name: KlineProvider; load: (signal: AbortSignal) => Promise<Candle[]> }) {
       const controller = new AbortController();
       providerControllers.push(controller);
-      const timeoutId = window.setTimeout(() => controller.abort(), 6000);
+      const timeoutId = window.setTimeout(() => controller.abort(), 10000);
 
       return candidate.load(controller.signal).finally(() => window.clearTimeout(timeoutId));
     }
@@ -452,7 +544,7 @@ function useBtcCandles(interval: KlineInterval) {
     async function load() {
       setIsLoading(true);
       setError('');
-      setStatus(`加载 CryptoCompare BTC/USDT ${selectedInterval.label}...`);
+      setStatus(`${cachedCandles || storedCandles ? '更新' : '加载'} BTC/USDT ${selectedInterval.label}...`);
 
       try {
         const providers: Array<{ name: KlineProvider; load: (signal: AbortSignal) => Promise<Candle[]> }> = [
@@ -490,14 +582,17 @@ function useBtcCandles(interval: KlineInterval) {
           return;
         }
 
-        klineCache.set(interval, { candles: nextCandles, provider });
-        setCandles(nextCandles);
-        setStatus(`${provider} BTC/USDT ${selectedInterval.label}`);
+        const currentCachedCandles = klineCache.get(interval)?.candles ?? [];
+        const mergedCandles = mergeCandles(currentCachedCandles, nextCandles);
+        klineCache.set(interval, { candles: mergedCandles, provider });
+        writeStoredKlineCache(interval, provider, mergedCandles);
+        setCandles(mergedCandles);
+        setStatus(`${provider} BTC/USDT ${selectedInterval.label} (${mergedCandles.length} 根)`);
       } catch (error) {
         if (isActive) {
           const message = error instanceof Error ? error.message : '未知错误';
           setError(`行情加载失败：${message}`);
-          setStatus(`BTC/USDT ${selectedInterval.label}`);
+          setStatus(`${cachedCandles || storedCandles ? '使用缓存' : 'BTC/USDT'} ${selectedInterval.label}`);
         }
       } finally {
         if (isActive) {
@@ -993,6 +1088,7 @@ function App() {
               requiredAverage={metrics.requiredAverageFromNow}
               bottomSignals={bottomSignals}
               layers={chartLayers}
+              isLoading={isLoading}
             />
           )}
           {error && showChart && <div className="chart-error">{error}</div>}
@@ -1590,6 +1686,7 @@ function CandlestickChart(props: {
   requiredAverage: number;
   bottomSignals: BottomSignal[];
   layers: ChartLayers;
+  isLoading: boolean;
 }) {
   const chartRef = useRef<SVGSVGElement | null>(null);
   const viewportRef = useRef<HTMLDivElement | null>(null);
@@ -1894,6 +1991,12 @@ function CandlestickChart(props: {
 
   return (
     <div className="chart-shell">
+      {props.isLoading && (
+        <div className="chart-loading-badge">
+          <span />
+          更新 K 线
+        </div>
+      )}
       <div className={`chart-viewport ${isDragging ? 'dragging' : ''}`} ref={viewportRef}>
         <svg
           ref={chartRef}
